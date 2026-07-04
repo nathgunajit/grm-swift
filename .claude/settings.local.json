@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan *)",
+      "Bash(composer install *)",
+      "Bash(composer require *)",
+      "Bash(/d/xampp/mysql/bin/mysql.exe *)"
+    ]
+  }
+}

@@ -7,47 +7,70 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('head')
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-slate-50">
 
-{{-- Top brand strip --}}
-<div class="bg-white border-b border-slate-100">
-    <div class="mx-auto max-w-7xl px-4 py-2.5 flex items-center justify-between gap-4">
-        <x-brand-bar compact class="justify-start" />
-        <div class="hidden sm:block text-right">
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-brand-700">ARIAS Society · Govt. of Assam</p>
-            <p class="text-[11px] text-slate-500">SWIFT Project — Grievance Redressal Mechanism</p>
+{{-- Accent top rule --}}
+<div class="h-1 bg-gradient-to-r from-accent-500 via-accent-400 to-brand-500"></div>
+
+{{-- Utility bar --}}
+<div class="bg-brand-900 text-brand-100/90 text-xs">
+    <div class="mx-auto max-w-7xl px-4 h-9 flex items-center justify-between">
+        <span class="flex items-center gap-1.5"><x-icon name="globe" class="w-3.5 h-3.5 text-accent-400" /> Government of Assam · ARIAS Society</span>
+        <div class="hidden sm:flex items-center gap-5">
+            <a href="tel:03612332004" class="flex items-center gap-1.5 hover:text-white transition"><x-icon name="phone" class="w-3.5 h-3.5" /> Helpline: 0361-2332004</a>
+            <a href="mailto:spd@arias.in" class="flex items-center gap-1.5 hover:text-white transition"><x-icon name="envelope" class="w-3.5 h-3.5" /> spd@arias.in</a>
         </div>
     </div>
 </div>
 
+{{-- Masthead --}}
+<header class="bg-white border-b border-slate-100">
+    <div class="mx-auto max-w-7xl px-4 py-3.5 flex items-center justify-between gap-4">
+        <a href="{{ route('home') }}" class="flex items-center gap-3 sm:gap-5 group">
+            <img src="{{ asset('images/arias-logo.png') }}" alt="ARIAS Society" class="h-11 sm:h-14 w-auto object-contain">
+            <span class="hidden sm:block h-11 w-px bg-slate-200"></span>
+            <span>
+                <span class="block font-display text-lg sm:text-2xl font-extrabold text-brand-800 leading-tight group-hover:text-brand-700 transition">SWIFT GRM Portal</span>
+                <span class="block text-[11px] sm:text-sm text-slate-500">Grievance Redressal Mechanism · Assam SWIFT Project</span>
+            </span>
+        </a>
+        <div class="flex items-center gap-4 sm:gap-6">
+            <img src="{{ asset('images/swift-logo.png') }}" alt="SWIFT Project" class="h-12 sm:h-16 w-auto object-contain">
+            <img src="{{ asset('images/assam-govt-logo.png') }}" alt="Government of Assam" class="h-11 sm:h-14 w-auto object-contain">
+        </div>
+    </div>
+</header>
+
 {{-- Main navigation --}}
-<nav x-data="{ open: false }" class="sticky top-0 z-40 bg-gradient-to-r from-brand-800 to-brand-600 shadow-lg">
+<nav x-data="{ open: false }" class="sticky top-0 z-40 bg-gradient-to-r from-brand-900 via-brand-800 to-brand-600 shadow-lg ring-1 ring-black/5">
     <div class="mx-auto max-w-7xl px-4">
         <div class="flex h-14 items-center justify-between">
-            <a href="{{ route('home') }}" class="flex items-center gap-2 text-white font-display font-bold text-lg">
-               <img src="images/GRMLOGO.png"> SWIFT GRM
-            </a>
-            <div class="hidden lg:flex items-center gap-1 text-sm">
-                @php $nav = [['home','Home'],['grievance.create','Register Complaint'],['track','Track Complaint'],['process','GRM Process'],['resources','Resources'],['faq','Help & FAQ'],['contact','Contact']]; @endphp
+            @php $nav = [['home','Home'],['grievance.create','Register Complaint'],['track','Track Complaint'],['process','GRM Process'],['resources','Resources'],['faq','Help & FAQ'],['contact','Contact']]; @endphp
+            <a href="{{ route('home') }}" class="lg:hidden flex items-center gap-2 text-white font-display font-bold"><x-icon name="water" class="w-5 h-5 text-accent-400" /> SWIFT GRM</a>
+            <div class="hidden lg:flex items-center gap-0.5 text-sm">
                 @foreach ($nav as [$route, $label])
-                    <a href="{{ route($route) }}" class="rounded-md px-3 py-2 font-medium text-brand-50 hover:bg-white/10 hover:text-white transition {{ request()->routeIs($route) ? 'bg-white/15 text-white' : '' }}">{{ $label }}</a>
+                    @php $active = request()->routeIs($route); @endphp
+                    <a href="{{ route($route) }}" class="relative rounded-md px-3.5 py-2 font-medium transition {{ $active ? 'text-white' : 'text-brand-50/90 hover:bg-white/10 hover:text-white' }}">
+                        {{ $label }}
+                        @if ($active)<span class="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-accent-400"></span>@endif
+                    </a>
                 @endforeach
-                <a href="{{ route('login') }}" class="ml-2 inline-flex items-center gap-1.5 rounded-md border border-white/40 px-3 py-1.5 font-semibold text-white hover:bg-white/10">
-                    <x-icon name="lock" class="w-4 h-4" /> Official Login
-                </a>
             </div>
-            <button @click="open = !open" class="lg:hidden text-white p-2" aria-label="Menu">
+            <a href="{{ route('login') }}" class="hidden lg:inline-flex items-center gap-1.5 rounded-lg bg-white/10 border border-white/25 px-3.5 py-1.5 font-semibold text-white hover:bg-white/20 transition">
+                <x-icon name="lock" class="w-4 h-4" /> Official Login
+            </a>
+            <button @click="open = !open" class="lg:hidden text-white p-2 -mr-2" aria-label="Menu">
                 <x-icon name="menu" class="w-6 h-6" x-show="!open" />
                 <x-icon name="x" class="w-6 h-6" x-show="open" x-cloak />
             </button>
         </div>
     </div>
     {{-- Mobile menu --}}
-    <div x-show="open" x-cloak class="lg:hidden bg-brand-800 px-4 pb-4 space-y-1">
+    <div x-show="open" x-cloak class="lg:hidden bg-brand-800 px-4 pb-4 pt-1 space-y-1 border-t border-white/10">
         @foreach ($nav as [$route, $label])
-            <a href="{{ route($route) }}" class="block rounded-md px-3 py-2 text-brand-50 hover:bg-white/10">{{ $label }}</a>
+            <a href="{{ route($route) }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs($route) ? 'bg-white/15 text-white' : 'text-brand-50 hover:bg-white/10' }}">{{ $label }}</a>
         @endforeach
-        <a href="{{ route('login') }}" class="block rounded-md px-3 py-2 font-semibold text-accent-300 hover:bg-white/10">Official Login</a>
+        <a href="{{ route('login') }}" class="mt-1 flex items-center gap-1.5 rounded-md bg-accent-500 px-3 py-2 font-semibold text-white"><x-icon name="lock" class="w-4 h-4" /> Official Login</a>
     </div>
 </nav>
 

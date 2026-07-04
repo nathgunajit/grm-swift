@@ -1,66 +1,70 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SWIFT GRM Portal
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A **Grievance Redressal Mechanism (GRM)** web application for the ADB-assisted **Assam Sustainable Wetland and Integrated Fisheries Transformation (SWIFT) Project**, managed by ARIAS Society, Government of Assam.
 
-## About Laravel
+Built with **Laravel 11**, **MySQL/MariaDB**, and **Bootstrap 5**.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Public portal (no login)**
+- Register a grievance online (or anonymously/confidentially) with document uploads — mobile is format-validated (no OTP)
+- Instant **Tracking ID** (`GRM-YYYY-NNNNNN`) and downloadable **Acknowledgment PDF**
+- Track status by tracking/acknowledgment ID or mobile, with a full status timeline
+- Download the resolution letter, submit a satisfaction feedback form, or reopen if not satisfied
+- GRM process, FAQ, resources, privacy policy, contact pages
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**Admin panel (official login by email or mobile)**
+- Per-role dashboards scoped by jurisdiction (beel / district / CPIU / level)
+- Manual grievance entry for offline complaints
+- Review, comment, **escalate** through the 3-tier GRC, and **resolve** with a generated resolution PDF
+- Sensitive cases (GBV/SEA-SH, misconduct) flagged for confidential priority handling
+- Masters CRUD (districts, blocks, revenue circles, CPIUs, beels), user management with assignment history, GRC committees (with a ≥30%-women indicator)
+- Reports: counts by status/category/level/district, SLA resolution rate, average time, feedback summary — exportable to CSV and PDF
 
-## Learning Laravel
+## Three-tier Grievance Redressal Committee
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| Level | Committee | SLA |
+|-------|-----------|-----|
+| I | Field / Beel GRC | 7 days |
+| II | Cluster / CPIU GRC | 15 days |
+| III | PIU GRC | 15 days |
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Roles
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Public User · Beel Animator · BDC Facilitator · SSGC · DFDO · CPIU Officer · PIU Officer · PMU Admin · Super Admin
 
-## Laravel Sponsors
+## Setup
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Requires PHP 8.2+, Composer, and MySQL/MariaDB (e.g. XAMPP).
 
-### Premium Partners
+```bash
+composer install
+cp .env.example .env          # then set DB_DATABASE=grm_swift, DB_USERNAME=root, DB_PASSWORD=
+php artisan key:generate
+mysql -u root -e "CREATE DATABASE grm_swift CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+php artisan migrate:fresh --seed
+php artisan storage:link
+php artisan serve             # http://127.0.0.1:8000
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### Seeded logins
 
-## Contributing
+| Role | Email | Password |
+|------|-------|----------|
+| Super Admin | admin@grmswift.local | Admin@123 |
+| SSGC (and other officials) | ssgc@grmswift.local | Password@123 |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Other seeded officials: `animator@`, `bdc@`, `dfdo@`, `cpiu@`, `piu@`, `pmu@grmswift.local` (all `Password@123`).
 
-## Code of Conduct
+## Tests
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+mysql -u root -e "CREATE DATABASE grm_swift_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+php artisan test
+```
 
-## Security Vulnerabilities
+## Documentation
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- `CLAUDE.md` — project/architecture guide
+- `ACTIONS.md` — step-by-step build log
+- `docs/` — source requirement documents (GRM Manual, spec, page list)

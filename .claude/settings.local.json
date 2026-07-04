@@ -4,7 +4,8 @@
       "Bash(php artisan *)",
       "Bash(composer install *)",
       "Bash(composer require *)",
-      "Bash(/d/xampp/mysql/bin/mysql.exe *)"
+      "Bash(/d/xampp/mysql/bin/mysql.exe *)",
+      "Bash(curl -s -o /dev/null -w \"home:%{http_code}\\\\n\" http://127.0.0.1:8123/)"
     ]
   }
 }

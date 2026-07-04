@@ -89,4 +89,23 @@ class Grievance extends Model
             default => 'Level '.$this->current_level,
         };
     }
+
+    /**
+     * Restrict the query to what the given user may see, based on their role
+     * and jurisdiction (beel / district / CPIU / level).
+     */
+    public function scopeVisibleTo($query, User $user)
+    {
+        return match ($user->role()) {
+            // Full visibility.
+            'super_admin', 'pmu_admin', 'piu_officer' => $query,
+            // CPIU officer: their CPIU's beels, focus on Level II+.
+            'cpiu_officer' => $query->whereHas('beel', fn ($q) => $q->where('cpiu_id', $user->cpiu_id)),
+            // District-level officials.
+            'ssgc', 'dfdo', 'bdc_facilitator' => $query->where('district_id', $user->district_id),
+            // Beel animator: only their beel.
+            'beel_animator' => $query->where('beel_id', $user->beel_id),
+            default => $query->whereRaw('1 = 0'),
+        };
+    }
 }

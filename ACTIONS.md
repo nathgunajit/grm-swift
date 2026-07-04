@@ -33,3 +33,38 @@ Every step and action taken to build this project is recorded here, newest at th
 16. Wrote seeders: `MasterSeeder` (9 roles, 9 grievance categories, 5 districts, 3 CPIUs, blocks/circles, 5 beels, 3 GRC committees with members), `UserSeeder` (Super Admin + 7 role users), `GrievanceSeeder` (6 demo grievances across statuses/levels with timeline + a feedback record).
 17. Ran `php artisan migrate:fresh --seed` — clean. Verified counts: 9 user_types, 8 users, 9 categories, 5 beels, 6 grievances, 19 actions, 3 committees.
 18. `git init` and first commit.
+
+## 2026-07-04 — Phase 3: Public portal
+
+19. Built `layouts/public` (Bootstrap 5 via CDN, GRM green theme, nav + footer), `status-badge` Blade component.
+20. `HomeController` + views: home (hero, live status counters, 3-tier overview), GRM process, FAQ (accordion), resources (with doc download route), privacy policy, contact.
+21. `GrievanceController` + `StoreGrievanceRequest`: submit form (all GRM.docx fields, anonymous toggle, mobile format validation — no OTP, file uploads), tracking-ID generation, acknowledgment PDF (Annexure III), confirmation page.
+22. Track page: search by tracking/acknowledgment ID or mobile; status timeline from `grievance_actions`; resolution PDF; post-resolution feedback form (Annexure V) that closes the grievance; reopen (escalates to next level).
+
+## 2026-07-04 — Phase 4: Auth, role middleware, dashboards
+
+23. `LoginController` (login with email OR mobile + password, active-account check), login view with demo credentials, logout.
+24. `EnsureUserHasRole` middleware registered as `role` alias in `bootstrap/app.php`.
+25. `layouts/admin` with role-aware sidebar; `DashboardController` with per-role KPI cards + recent grievances.
+26. Added `Grievance::scopeVisibleTo($user)` — jurisdiction scoping (beel / district / CPIU / full) enforced on all queues and detail views.
+
+## 2026-07-04 — Phase 5: Grievance workflow
+
+27. `GrievanceAdminController`: queue with filters, detail view, manual entry, review/comment/escalate/resolve — each writing a `grievance_actions` row; sensitive cases flagged for ICC referral; resolution generates the resolution PDF; SLA-overdue highlighting.
+
+## 2026-07-04 — Phase 6: Admin masters, users, committees
+
+28. CRUD controllers + views for districts, blocks, revenue circles, CPIUs, beels (HTML5 `form`-attribute inline editing), user types.
+29. `UserController`: official registration (EMPID etc.), edit, and assignment history with assign/relieve dates.
+30. `CommitteeController`: GRC committees per level with members and a ≥30%-women indicator.
+
+## 2026-07-04 — Phase 7: Reports
+
+31. `ReportController`: counts by status/category/level/district, SLA resolution rate, average resolution time, escalations, feedback satisfaction; CSV and PDF (`pdf/report`) export.
+
+## 2026-07-04 — Phase 8: Tests & end-to-end verification
+
+32. Created `grm_swift_test` DB; pointed phpunit at it.
+33. Wrote feature tests: `PublicPortalTest`, `AuthTest`, `GrievanceWorkflowTest`.
+34. `php artisan test` — **18 passed (53 assertions)**.
+35. Drove the live app on `php artisan serve`: submitted a grievance (GRM-2026-000007) → acknowledgment PDF → logged in as SSGC → reviewed → escalated L1→L2 → resolved → resolution PDF; verified jurisdiction 403s, role 403s, all admin pages 200, reports CSV/PDF export.

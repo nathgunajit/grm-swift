@@ -68,3 +68,13 @@ Every step and action taken to build this project is recorded here, newest at th
 33. Wrote feature tests: `PublicPortalTest`, `AuthTest`, `GrievanceWorkflowTest`.
 34. `php artisan test` — **18 passed (53 assertions)**.
 35. Drove the live app on `php artisan serve`: submitted a grievance (GRM-2026-000007) → acknowledgment PDF → logged in as SSGC → reviewed → escalated L1→L2 → resolved → resolution PDF; verified jurisdiction 403s, role 403s, all admin pages 200, reports CSV/PDF export.
+36. Added project `README.md`.
+
+## 2026-07-04 — Phase 9: Git push to GitHub
+
+37. Local git repository complete with 3 commits:
+    - `Phase 1-2: scaffold Laravel app + database layer`
+    - `Phase 3-8: public portal, admin panel, workflow, reports, tests`
+    - `Add project README`
+38. Added remote `origin` = https://github.com/nathgunajit/grm-swift.git (provided by user).
+39. Pushed `master` to GitHub — all commits confirmed on the remote. **Project complete.**

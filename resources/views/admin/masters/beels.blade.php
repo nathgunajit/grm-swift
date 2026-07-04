@@ -3,50 +3,57 @@
 @section('heading', 'Beels')
 
 @section('content')
-@if ($errors->any())<div class="alert alert-danger small">{{ $errors->first() }}</div>@endif
-<div class="row g-4">
-    <div class="col-md-4">
-        <div class="card shadow-sm"><div class="card-header bg-white">Add Beel</div>
-            <div class="card-body">
-                <form method="POST" action="{{ route('admin.beels.store') }}">
-                    @csrf
-                    <div class="mb-2"><label class="form-label small">Name</label><input name="name" class="form-control form-control-sm" required></div>
-                    <div class="mb-2"><label class="form-label small">District</label>
-                        <select name="district_id" class="form-select form-select-sm"><option value="">--</option>@foreach ($districts as $d)<option value="{{ $d->id }}">{{ $d->name }}</option>@endforeach</select></div>
-                    <div class="mb-2"><label class="form-label small">Block</label>
-                        <select name="block_id" class="form-select form-select-sm"><option value="">--</option>@foreach ($blocks as $b)<option value="{{ $b->id }}">{{ $b->name }}</option>@endforeach</select></div>
-                    <div class="mb-2"><label class="form-label small">CPIU</label>
-                        <select name="cpiu_id" class="form-select form-select-sm"><option value="">--</option>@foreach ($cpius as $c)<option value="{{ $c->id }}">{{ $c->name }}</option>@endforeach</select></div>
-                    <button class="btn btn-sm btn-grm w-100"><i class="bi bi-plus"></i> Add</button>
-                </form>
+@if ($errors->any())<div class="mb-4 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 px-4 py-2 text-sm">{{ $errors->first() }}</div>@endif
+<div class="grid gap-5 lg:grid-cols-3">
+    <div class="card card-pad">
+        <h3 class="font-semibold text-slate-800 mb-3">Add Beel</h3>
+        <form method="POST" action="{{ route('admin.beels.store') }}" class="space-y-3">
+            @csrf
+            <div><label class="label">Name</label><input name="name" class="input" required></div>
+            <div><label class="label">District</label><select name="district_id" class="input"><option value="">--</option>@foreach ($districts as $d)<option value="{{ $d->id }}">{{ $d->name }}</option>@endforeach</select></div>
+            <div><label class="label">Block</label><select name="block_id" class="input"><option value="">--</option>@foreach ($blocks as $b)<option value="{{ $b->id }}">{{ $b->name }}</option>@endforeach</select></div>
+            <div><label class="label">CPIU</label><select name="cpiu_id" class="input"><option value="">--</option>@foreach ($cpius as $c)<option value="{{ $c->id }}">{{ $c->name }}</option>@endforeach</select></div>
+            <div class="grid grid-cols-2 gap-2">
+                <div><label class="label">Latitude</label><input name="latitude" type="number" step="any" class="input" placeholder="26.1197"></div>
+                <div><label class="label">Longitude</label><input name="longitude" type="number" step="any" class="input" placeholder="91.6533"></div>
             </div>
-        </div>
+            <button class="btn btn-primary btn-sm w-full"><x-icon name="plus" class="w-4 h-4" /> Add</button>
+        </form>
     </div>
-    <div class="col-md-8">
+    <div class="lg:col-span-2">
         @foreach ($beels as $b)
             <form id="up-{{ $b->id }}" method="POST" action="{{ route('admin.beels.update', $b) }}">@csrf @method('PUT')</form>
             <form id="del-{{ $b->id }}" method="POST" action="{{ route('admin.beels.destroy', $b) }}" onsubmit="return confirm('Delete this beel?')">@csrf @method('DELETE')</form>
         @endforeach
-        <div class="card shadow-sm"><div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light"><tr><th>Name</th><th>District</th><th>CPIU</th><th></th></tr></thead>
+        <div class="card overflow-x-auto">
+            <table class="table-grm">
+                <thead><tr><th>Name</th><th>District</th><th>CPIU</th><th>Location</th><th></th></tr></thead>
                 <tbody>
                     @foreach ($beels as $b)
                         <tr>
-                            <td><input form="up-{{ $b->id }}" name="name" value="{{ $b->name }}" class="form-control form-control-sm"></td>
-                            <td><select form="up-{{ $b->id }}" name="district_id" class="form-select form-select-sm"><option value="">--</option>@foreach ($districts as $d)<option value="{{ $d->id }}" @selected($b->district_id==$d->id)>{{ $d->name }}</option>@endforeach</select></td>
-                            <td><select form="up-{{ $b->id }}" name="cpiu_id" class="form-select form-select-sm"><option value="">--</option>@foreach ($cpius as $c)<option value="{{ $c->id }}" @selected($b->cpiu_id==$c->id)>{{ $c->name }}</option>@endforeach</select></td>
-                            <td class="text-nowrap">
+                            <td><input form="up-{{ $b->id }}" name="name" value="{{ $b->name }}" class="input min-w-32"></td>
+                            <td><select form="up-{{ $b->id }}" name="district_id" class="input"><option value="">--</option>@foreach ($districts as $d)<option value="{{ $d->id }}" @selected($b->district_id==$d->id)>{{ $d->name }}</option>@endforeach</select></td>
+                            <td><select form="up-{{ $b->id }}" name="cpiu_id" class="input"><option value="">--</option>@foreach ($cpius as $c)<option value="{{ $c->id }}" @selected($b->cpiu_id==$c->id)>{{ $c->name }}</option>@endforeach</select></td>
+                            <td>
                                 <input form="up-{{ $b->id }}" type="hidden" name="block_id" value="{{ $b->block_id }}">
-                                <button form="up-{{ $b->id }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-check"></i></button>
-                                <button form="del-{{ $b->id }}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                <div class="flex items-center gap-1">
+                                    <input form="up-{{ $b->id }}" name="latitude" value="{{ $b->latitude }}" class="input w-24" placeholder="lat">
+                                    <input form="up-{{ $b->id }}" name="longitude" value="{{ $b->longitude }}" class="input w-24" placeholder="lng">
+                                    @if ($b->latitude && $b->longitude)
+                                        <a href="https://www.google.com/maps?q={{ $b->latitude }},{{ $b->longitude }}" target="_blank" class="text-brand-600" title="View on map"><x-icon name="map-pin" class="w-5 h-5" /></a>
+                                    @endif
+                                </div>
+                            </td>
+                            <td class="whitespace-nowrap">
+                                <button form="up-{{ $b->id }}" class="btn btn-sm btn-outline"><x-icon name="check" class="w-4 h-4" /></button>
+                                <button form="del-{{ $b->id }}" class="btn btn-sm btn-danger"><x-icon name="trash" class="w-4 h-4" /></button>
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
-        </div></div>
-        <div class="mt-2">{{ $beels->links() }}</div>
+        </div>
+        <div class="mt-3">{{ $beels->links() }}</div>
     </div>
 </div>
 @endsection

@@ -2,7 +2,7 @@
 
 A **Grievance Redressal Mechanism (GRM)** web application for the ADB-assisted **Assam Sustainable Wetland and Integrated Fisheries Transformation (SWIFT) Project**, managed by ARIAS Society, Government of Assam.
 
-Built with **Laravel 11**, **MySQL/MariaDB**, and **Bootstrap 5**.
+Built with **Laravel 11**, **MySQL/MariaDB**, and **Tailwind CSS v4** (Alpine.js + Chart.js), with branded PDF generation via dompdf.
 
 ## Features
 
@@ -39,13 +39,16 @@ Requires PHP 8.2+, Composer, and MySQL/MariaDB (e.g. XAMPP).
 
 ```bash
 composer install
-cp .env.example .env          # then set DB_DATABASE=grm_swift, DB_USERNAME=root, DB_PASSWORD=
+npm install && npm run build   # compiles Tailwind v4 + Alpine + Chart.js
+cp .env.example .env           # then set DB_DATABASE=grm_swift, DB_USERNAME=root, DB_PASSWORD=
 php artisan key:generate
 mysql -u root -e "CREATE DATABASE grm_swift CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
 php artisan migrate:fresh --seed
 php artisan storage:link
-php artisan serve             # http://127.0.0.1:8000
+php artisan serve              # http://127.0.0.1:8000
 ```
+
+> The compiled front-end assets in `public/build` are committed, so the app renders on XAMPP without a build step. Re-run `npm run build` after changing any Blade/CSS/JS.
 
 ### Seeded logins
 

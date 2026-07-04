@@ -50,6 +50,8 @@ class BeelController extends Controller
             'district_id' => ['nullable', 'exists:districts,id'],
             'block_id' => ['nullable', 'exists:blocks,id'],
             'cpiu_id' => ['nullable', 'exists:cpius,id'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ]);
     }
 }

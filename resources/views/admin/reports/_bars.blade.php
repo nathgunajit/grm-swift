@@ -1,11 +1,11 @@
 @php $max = collect($data)->max() ?: 1; @endphp
 @forelse ($data as $label => $value)
-    <div class="mb-2">
-        <div class="d-flex justify-content-between small"><span>{{ $label }}</span><span class="fw-semibold">{{ $value }}</span></div>
-        <div class="progress" style="height:8px;">
-            <div class="progress-bar bg-{{ $color }}" style="width: {{ round($value / $max * 100) }}%"></div>
+    <div class="mb-3">
+        <div class="flex justify-between text-sm mb-1"><span class="text-slate-600">{{ $label }}</span><span class="font-semibold text-slate-800">{{ $value }}</span></div>
+        <div class="h-2 rounded-full bg-slate-100 overflow-hidden">
+            <div class="h-full rounded-full {{ $color }}" style="width: {{ round($value / $max * 100) }}%"></div>
         </div>
     </div>
 @empty
-    <p class="text-muted small mb-0">No data.</p>
+    <p class="text-sm text-slate-400">No data.</p>
 @endforelse

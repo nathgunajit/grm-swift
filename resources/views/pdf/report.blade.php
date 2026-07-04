@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <style>
     body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color:#222; }
+    .logos { width:100%; border-collapse:collapse; margin-bottom:6px; }
+    .logos td { text-align:center; vertical-align:middle; width:33%; }
+    .logos img { height:42px; }
     .header { text-align:center; border-bottom:2px solid #0b5e4f; padding-bottom:8px; margin-bottom:14px; }
     .header h2 { margin:0; color:#0b5e4f; }
     h4 { color:#0b5e4f; margin:16px 0 6px; border-bottom:1px solid #cfd8d5; padding-bottom:3px; }
@@ -15,6 +18,13 @@
 </style>
 </head>
 <body>
+    <table class="logos">
+        <tr>
+            <td><img src="{{ public_path('images/arias-logo.png') }}" alt="ARIAS"></td>
+            <td><img src="{{ public_path('images/swift-logo.png') }}" alt="SWIFT" style="height:50px;"></td>
+            <td><img src="{{ public_path('images/assam-govt-logo.png') }}" alt="Govt of Assam"></td>
+        </tr>
+    </table>
     <div class="header">
         <h2>SWIFT GRM — Monitoring Report</h2>
         <p>Assam Sustainable Wetland and Integrated Fisheries Transformation (SWIFT) Project</p>

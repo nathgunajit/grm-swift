@@ -1,95 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'SWIFT GRM Portal')</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <style>
-        :root { --grm-primary:#0b5e4f; --grm-accent:#1c7c66; }
-        body { font-family:'Segoe UI',system-ui,sans-serif; color:#1f2d2b; }
-        .navbar-grm { background:var(--grm-primary); }
-        .navbar-grm .navbar-brand, .navbar-grm .nav-link { color:#fff !important; }
-        .navbar-grm .nav-link:hover { color:#cfe9e1 !important; }
-        .hero { background:linear-gradient(135deg,var(--grm-primary),var(--grm-accent)); color:#fff; padding:3.5rem 0; }
-        .btn-grm { background:var(--grm-primary); color:#fff; }
-        .btn-grm:hover { background:#08483c; color:#fff; }
-        .text-grm { color:var(--grm-primary); }
-        .stat-card { border-left:4px solid var(--grm-primary); }
-        .timeline { list-style:none; padding-left:0; }
-        .timeline li { position:relative; padding-left:1.75rem; padding-bottom:1.1rem; border-left:2px solid #cfe0dc; margin-left:.5rem; }
-        .timeline li:last-child { border-left-color:transparent; }
-        .timeline li::before { content:''; position:absolute; left:-7px; top:2px; width:12px; height:12px; border-radius:50%; background:var(--grm-primary); }
-        footer.grm-footer { background:#08302a; color:#cfe0dc; }
-        footer.grm-footer a { color:#9fd3c6; text-decoration:none; }
-    </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('head')
 </head>
-<body class="d-flex flex-column min-vh-100 bg-light">
-<nav class="navbar navbar-expand-lg navbar-grm shadow-sm">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="{{ route('home') }}">
-            <i class="bi bi-water"></i> SWIFT GRM Portal
-        </a>
-        <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="nav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="{{ route('home') }}">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ route('grievance.create') }}">Register Complaint</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ route('track') }}">Track Complaint</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ route('process') }}">GRM Process</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ route('resources') }}">Resources</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ route('faq') }}">Help &amp; FAQ</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ route('contact') }}">Contact</a></li>
-                <li class="nav-item"><a class="nav-link border rounded px-3 ms-lg-2" href="{{ route('login') }}"><i class="bi bi-person-lock"></i> Official Login</a></li>
-            </ul>
+<body class="min-h-screen flex flex-col">
+
+{{-- Top brand strip --}}
+<div class="bg-white border-b border-slate-100">
+    <div class="mx-auto max-w-7xl px-4 py-2.5 flex items-center justify-between gap-4">
+        <x-brand-bar compact class="justify-start" />
+        <div class="hidden sm:block text-right">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-brand-700">ARIAS Society · Govt. of Assam</p>
+            <p class="text-[11px] text-slate-500">SWIFT Project — Grievance Redressal Mechanism</p>
         </div>
+    </div>
+</div>
+
+{{-- Main navigation --}}
+<nav x-data="{ open: false }" class="sticky top-0 z-40 bg-gradient-to-r from-brand-800 to-brand-600 shadow-lg">
+    <div class="mx-auto max-w-7xl px-4">
+        <div class="flex h-14 items-center justify-between">
+            <a href="{{ route('home') }}" class="flex items-center gap-2 text-white font-display font-bold text-lg">
+               <img src="images/GRMLOGO.png"> SWIFT GRM
+            </a>
+            <div class="hidden lg:flex items-center gap-1 text-sm">
+                @php $nav = [['home','Home'],['grievance.create','Register Complaint'],['track','Track Complaint'],['process','GRM Process'],['resources','Resources'],['faq','Help & FAQ'],['contact','Contact']]; @endphp
+                @foreach ($nav as [$route, $label])
+                    <a href="{{ route($route) }}" class="rounded-md px-3 py-2 font-medium text-brand-50 hover:bg-white/10 hover:text-white transition {{ request()->routeIs($route) ? 'bg-white/15 text-white' : '' }}">{{ $label }}</a>
+                @endforeach
+                <a href="{{ route('login') }}" class="ml-2 inline-flex items-center gap-1.5 rounded-md border border-white/40 px-3 py-1.5 font-semibold text-white hover:bg-white/10">
+                    <x-icon name="lock" class="w-4 h-4" /> Official Login
+                </a>
+            </div>
+            <button @click="open = !open" class="lg:hidden text-white p-2" aria-label="Menu">
+                <x-icon name="menu" class="w-6 h-6" x-show="!open" />
+                <x-icon name="x" class="w-6 h-6" x-show="open" x-cloak />
+            </button>
+        </div>
+    </div>
+    {{-- Mobile menu --}}
+    <div x-show="open" x-cloak class="lg:hidden bg-brand-800 px-4 pb-4 space-y-1">
+        @foreach ($nav as [$route, $label])
+            <a href="{{ route($route) }}" class="block rounded-md px-3 py-2 text-brand-50 hover:bg-white/10">{{ $label }}</a>
+        @endforeach
+        <a href="{{ route('login') }}" class="block rounded-md px-3 py-2 font-semibold text-accent-300 hover:bg-white/10">Official Login</a>
     </div>
 </nav>
 
 @if (session('success'))
-    <div class="container mt-3"><div class="alert alert-success alert-dismissible fade show">{{ session('success') }}<button class="btn-close" data-bs-dismiss="alert"></button></div></div>
+    <div class="mx-auto max-w-7xl px-4 pt-4">
+        <div class="rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 text-sm">{{ session('success') }}</div>
+    </div>
 @endif
 @if (session('error'))
-    <div class="container mt-3"><div class="alert alert-danger alert-dismissible fade show">{{ session('error') }}<button class="btn-close" data-bs-dismiss="alert"></button></div></div>
+    <div class="mx-auto max-w-7xl px-4 pt-4">
+        <div class="rounded-lg bg-rose-50 border border-rose-200 text-rose-800 px-4 py-3 text-sm">{{ session('error') }}</div>
+    </div>
 @endif
 
-<main class="flex-fill">
+<main class="flex-1">
     @yield('content')
 </main>
 
-<footer class="grm-footer mt-5 py-4">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-md-5">
-                <h6 class="text-white">ARIAS Society — SWIFT Project</h6>
-                <p class="small mb-1">Assam Sustainable Wetland and Integrated Fisheries Transformation (SWIFT) Project, financed by the Asian Development Bank (ADB).</p>
-                <p class="small mb-0">Agriculture Complex, Khanapara, G.S. Road, Guwahati-781022</p>
+<footer class="mt-16 bg-brand-900 text-brand-100">
+    <div class="mx-auto max-w-7xl px-4 py-10">
+        <div class="grid gap-8 md:grid-cols-4">
+            <div class="md:col-span-2">
+                <div class="flex items-center gap-2 text-white font-display font-bold text-lg mb-3">
+                    <x-icon name="water" class="w-6 h-6 text-accent-400" /> SWIFT GRM Portal
+                </div>
+                <p class="text-sm text-brand-100/80 leading-relaxed">Assam Sustainable Wetland and Integrated Fisheries Transformation (SWIFT) Project, financed by the Asian Development Bank (ADB) and implemented by ARIAS Society, Government of Assam.</p>
+                <p class="text-sm text-brand-100/70 mt-3">Agriculture Complex, Khanapara, G.S. Road, Guwahati-781022</p>
             </div>
-            <div class="col-md-4">
-                <h6 class="text-white">Quick Links</h6>
-                <ul class="list-unstyled small">
-                    <li><a href="{{ route('grievance.create') }}">Register a Grievance</a></li>
-                    <li><a href="{{ route('track') }}">Track Status</a></li>
-                    <li><a href="{{ route('process') }}">GRM Process</a></li>
-                    <li><a href="{{ route('privacy') }}">Privacy Policy</a></li>
+            <div>
+                <h6 class="text-white font-semibold mb-3">Quick Links</h6>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="{{ route('grievance.create') }}" class="hover:text-white">Register a Grievance</a></li>
+                    <li><a href="{{ route('track') }}" class="hover:text-white">Track Status</a></li>
+                    <li><a href="{{ route('process') }}" class="hover:text-white">GRM Process</a></li>
+                    <li><a href="{{ route('privacy') }}" class="hover:text-white">Privacy Policy</a></li>
                 </ul>
             </div>
-            <div class="col-md-3">
-                <h6 class="text-white">Contact</h6>
-                <p class="small mb-1"><i class="bi bi-telephone"></i> 0361-2332004</p>
-                <p class="small mb-0"><i class="bi bi-envelope"></i> spd@arias.in</p>
+            <div>
+                <h6 class="text-white font-semibold mb-3">Contact</h6>
+                <ul class="space-y-2 text-sm">
+                    <li class="flex items-center gap-2"><x-icon name="phone" class="w-4 h-4" /> 0361-2332004</li>
+                    <li class="flex items-center gap-2"><x-icon name="envelope" class="w-4 h-4" /> spd@arias.in</li>
+                    <li class="flex items-center gap-2"><x-icon name="globe" class="w-4 h-4" /> www.arias.in</li>
+                </ul>
             </div>
         </div>
-        <hr class="border-secondary">
-        <p class="small text-center mb-0">&copy; {{ date('Y') }} ARIAS Society, Government of Assam. All grievances are handled free of cost.</p>
+        <div class="mt-8 border-t border-white/10 pt-5 text-center text-xs text-brand-100/70">
+            &copy; {{ date('Y') }} ARIAS Society, Government of Assam. All grievances are handled free of cost.
+        </div>
     </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-@stack('scripts')
+<style>[x-cloak]{display:none!important}</style>
 </body>
 </html>

@@ -11,6 +11,7 @@ use App\Models\District;
 use App\Models\GrievanceCategory;
 use App\Models\RevenueCircle;
 use App\Models\UserType;
+use App\Models\Zone;
 use Illuminate\Database\Seeder;
 
 class MasterSeeder extends Seeder
@@ -59,12 +60,28 @@ class MasterSeeder extends Seeder
             );
         }
 
-        $cpiuNames = ['CPIU Guwahati', 'CPIU Nagaon', 'CPIU Barpeta'];
+        // Zones (each groups one or more CPIUs)
+        $zoneData = [
+            'Lower Assam Zone' => 'Z01',
+            'Central Assam Zone' => 'Z02',
+            'Upper Assam Zone' => 'Z03',
+        ];
+        $zones = [];
+        foreach ($zoneData as $name => $code) {
+            $zones[$name] = Zone::updateOrCreate(['name' => $name], ['code' => $code, 'description' => 'SWIFT operational zone.']);
+        }
+
+        $cpiuData = [
+            'CPIU Guwahati' => 'Lower Assam Zone',
+            'CPIU Nagaon' => 'Central Assam Zone',
+            'CPIU Barpeta' => 'Lower Assam Zone',
+        ];
         $cpius = [];
-        foreach ($cpiuNames as $i => $name) {
+        $i = 0;
+        foreach ($cpiuData as $name => $zoneName) {
             $cpius[$name] = Cpiu::updateOrCreate(
                 ['name' => $name],
-                ['code' => 'C'.str_pad($i + 1, 2, '0', STR_PAD_LEFT)]
+                ['code' => 'C'.str_pad(++$i, 2, '0', STR_PAD_LEFT), 'zone_id' => $zones[$zoneName]->id]
             );
         }
 
@@ -74,11 +91,11 @@ class MasterSeeder extends Seeder
         }
 
         $beelData = [
-            ['name' => 'Deepor Beel', 'district' => 'Kamrup', 'cpiu' => 'CPIU Guwahati'],
-            ['name' => 'Sone Beel', 'district' => 'Barpeta', 'cpiu' => 'CPIU Barpeta'],
-            ['name' => 'Morikolong Beel', 'district' => 'Nagaon', 'cpiu' => 'CPIU Nagaon'],
-            ['name' => 'Charan Beel', 'district' => 'Morigaon', 'cpiu' => 'CPIU Nagaon'],
-            ['name' => 'Diplai Beel', 'district' => 'Dhubri', 'cpiu' => 'CPIU Barpeta'],
+            ['name' => 'Deepor Beel', 'district' => 'Kamrup', 'cpiu' => 'CPIU Guwahati', 'lat' => 26.1197, 'lng' => 91.6533],
+            ['name' => 'Sone Beel', 'district' => 'Barpeta', 'cpiu' => 'CPIU Barpeta', 'lat' => 24.5333, 'lng' => 92.4667],
+            ['name' => 'Morikolong Beel', 'district' => 'Nagaon', 'cpiu' => 'CPIU Nagaon', 'lat' => 26.3500, 'lng' => 92.6800],
+            ['name' => 'Charan Beel', 'district' => 'Morigaon', 'cpiu' => 'CPIU Nagaon', 'lat' => 26.2500, 'lng' => 92.3400],
+            ['name' => 'Diplai Beel', 'district' => 'Dhubri', 'cpiu' => 'CPIU Barpeta', 'lat' => 26.0200, 'lng' => 89.9800],
         ];
         foreach ($beelData as $b) {
             $district = $districts[$b['district']];
@@ -89,6 +106,8 @@ class MasterSeeder extends Seeder
                     'district_id' => $district->id,
                     'block_id' => $block?->id,
                     'cpiu_id' => $cpius[$b['cpiu']]->id,
+                    'latitude' => $b['lat'],
+                    'longitude' => $b['lng'],
                 ]
             );
         }

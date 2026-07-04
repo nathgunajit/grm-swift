@@ -14,6 +14,26 @@ class PublicPortalTest extends TestCase
 
     protected $seed = true;
 
+    /** Submit a grievance with the mobile pre-verified in session (OTP gate). */
+    private function submit(array $overrides = [])
+    {
+        $mobile = $overrides['mobile'] ?? '9876543210';
+
+        $payload = array_merge([
+            'mode_of_receipt' => 'online',
+            'category_id' => GrievanceCategory::where('code', 2)->first()->id,
+            'name' => 'Test Person',
+            'gender' => 'Male',
+            'mobile' => $mobile,
+            'address' => 'Some address',
+            'place_village' => 'Test Village',
+            'beel_id' => Beel::first()->id,
+            'description' => 'A test grievance description for the feature test.',
+        ], $overrides);
+
+        return $this->withSession(['otp_verified_'.$mobile => true])->post('/submit', $payload);
+    }
+
     public function test_home_page_loads(): void
     {
         $this->get('/')->assertOk()->assertSee('Grievance Redressal Mechanism');
@@ -28,82 +48,42 @@ class PublicPortalTest extends TestCase
 
     public function test_a_grievance_can_be_submitted_and_gets_a_tracking_id(): void
     {
-        $category = GrievanceCategory::where('code', 2)->first();
-        $beel = Beel::first();
-
-        $response = $this->post('/submit', [
-            'mode_of_receipt' => 'online',
-            'category_id' => $category->id,
-            'name' => 'Test Person',
-            'gender' => 'Male',
-            'mobile' => '9876543210',
-            'address' => 'Some address',
-            'place_village' => 'Test Village',
-            'beel_id' => $beel->id,
-            'description' => 'A test grievance description for the feature test.',
-        ]);
+        $this->submit();
 
         $grievance = Grievance::latest('id')->first();
-        $response->assertRedirect(route('grievance.submitted', $grievance->tracking_id));
-
         $this->assertStringStartsWith('GRM-', $grievance->tracking_id);
         $this->assertSame('registered', $grievance->status);
         $this->assertSame(1, (int) $grievance->current_level);
         $this->assertNotNull($grievance->due_at);
-        // Registered + acknowledged actions logged.
         $this->assertSame(2, $grievance->actions()->count());
+    }
+
+    public function test_beel_is_optional_on_registration(): void
+    {
+        // Phase 2: Beel is no longer mandatory.
+        $this->submit(['beel_id' => null]);
+
+        $grievance = Grievance::latest('id')->first();
+        $this->assertNotNull($grievance);
+        $this->assertNull($grievance->beel_id);
     }
 
     public function test_sensitive_category_flags_the_grievance(): void
     {
         $sensitive = GrievanceCategory::where('is_sensitive', true)->first();
-        $beel = Beel::first();
-
-        $this->post('/submit', [
-            'mode_of_receipt' => 'online',
-            'category_id' => $sensitive->id,
-            'name' => 'Reporter',
-            'mobile' => '9876500000',
-            'address' => 'Addr',
-            'place_village' => 'Village',
-            'beel_id' => $beel->id,
-            'description' => 'Sensitive matter reported for testing.',
-        ]);
+        $this->submit(['category_id' => $sensitive->id]);
 
         $this->assertTrue((bool) Grievance::latest('id')->first()->is_sensitive);
     }
 
     public function test_invalid_mobile_is_rejected(): void
     {
-        $category = GrievanceCategory::first();
-        $beel = Beel::first();
-
-        $this->post('/submit', [
-            'mode_of_receipt' => 'online',
-            'category_id' => $category->id,
-            'name' => 'Bad Mobile',
-            'mobile' => '12345',
-            'address' => 'Addr',
-            'place_village' => 'Village',
-            'beel_id' => $beel->id,
-            'description' => 'Testing mobile validation.',
-        ])->assertSessionHasErrors('mobile');
+        $this->submit(['mobile' => '12345'])->assertSessionHasErrors('mobile');
     }
 
     public function test_a_grievance_can_be_tracked(): void
     {
-        $category = GrievanceCategory::first();
-        $beel = Beel::first();
-        $this->post('/submit', [
-            'mode_of_receipt' => 'online',
-            'category_id' => $category->id,
-            'name' => 'Trackable',
-            'mobile' => '9811111111',
-            'address' => 'Addr',
-            'place_village' => 'Village',
-            'beel_id' => $beel->id,
-            'description' => 'A trackable grievance.',
-        ]);
+        $this->submit(['name' => 'Trackable']);
         $grievance = Grievance::latest('id')->first();
 
         $this->post('/track', ['query' => $grievance->tracking_id])

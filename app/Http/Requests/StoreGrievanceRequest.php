@@ -27,7 +27,8 @@ class StoreGrievanceRequest extends FormRequest
             'email' => ['nullable', 'email', 'max:255'],
             'address' => [$anonymous ? 'nullable' : 'required', 'string', 'max:1000'],
             'place_village' => ['required', 'string', 'max:255'],
-            'beel_id' => ['required', 'exists:beels,id'],
+            // Beel is no longer mandatory (Phase 2 requirement).
+            'beel_id' => ['nullable', 'exists:beels,id'],
             'description' => ['required', 'string', 'min:5'],
             'documents.*' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png,doc,docx', 'max:5120'],
             'is_anonymous' => ['nullable', 'boolean'],

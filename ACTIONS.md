@@ -77,4 +77,47 @@ Every step and action taken to build this project is recorded here, newest at th
     - `Phase 3-8: public portal, admin panel, workflow, reports, tests`
     - `Add project README`
 38. Added remote `origin` = https://github.com/nathgunajit/grm-swift.git (provided by user).
-39. Pushed `master` to GitHub — all commits confirmed on the remote. **Project complete.**
+39. Pushed `master` to GitHub — all commits confirmed on the remote. **V1 complete.**
+
+---
+
+# V2 — Phase 2 UI Enhancement (Tailwind CSS v4)
+
+Implements `docs/Phase 2- GRM Portal Enhancement Requirements – SWIFT Project.docx`.
+
+## 2026-07-04 — V2 Phase 1: Tailwind v4 build + design system
+
+40. Fetched the latest Tailwind CSS v4 + Laravel Vite setup via the context7 MCP.
+41. Installed `tailwindcss@4`, `@tailwindcss/vite`, `chart.js`, `alpinejs`; removed the Tailwind v3 deps and `postcss.config.js` / `tailwind.config.js`.
+42. Configured `vite.config.js` (`@tailwindcss/vite` plugin), `resources/css/app.css` (`@import "tailwindcss"`, `@theme` brand palette + Poppins/Inter fonts, `@layer components` for `.btn`/`.card`/`.input`/`.table-grm`/`.sidebar-link`), `resources/js/app.js` (Alpine + Chart.js). `npm run build` succeeds.
+43. Copied the three logos to `public/images/` (`swift-logo.png`, `arias-logo.png`, `assam-govt-logo.png`); added `<x-brand-bar>`, `<x-icon>` (inline-SVG set), and a Tailwind `<x-status-badge>`.
+
+## 2026-07-04 — V2 Phase 2: Public portal on Tailwind
+
+44. Rebuilt `layouts/public` (gradient header, three-logo brand strip, Alpine responsive nav, redesigned footer).
+45. Redesigned Home (hero, stat cards, 3-tier GRC, sensitive-case notice) and converted submit, submitted, track, process, faq, resources, privacy, contact, and login to Tailwind.
+
+## 2026-07-04 — V2 Phase 3: Registration change + demo OTP
+
+46. Made Beel **optional**: `StoreGrievanceRequest` `beel_id` nullable; controllers handle null beel; forms drop the required marker.
+47. Added `OtpController` (`/otp/send`, `/otp/verify`) — demo 6-digit OTP via cache + session verified flag (no SMS). Submit form gains an Alpine Send-OTP → Verify flow; `GrievanceController@store` blocks non-anonymous submits until the mobile is verified (anonymous skips OTP).
+
+## 2026-07-04 — V2 Phase 4: Admin panel on Tailwind + dashboard charts
+
+48. Rebuilt `layouts/admin` (Alpine collapsible sidebar, topbar dropdown). Converted all admin views (grievances index/show/create, reports, masters, users, committees).
+49. `DashboardController` builds chart data; dashboard renders Chart.js doughnut (status), bar (level), and 6-month trend line, plus responsive stat cards.
+
+## 2026-07-04 — V2 Phase 5: PDF branding + watermark
+
+50. Added the three-logo header to the acknowledgment, resolution, and report PDFs, and a diagonal low-opacity **watermark** ("Assam Sustainable Wetland and Integrated Fisheries Transformation (SWIFT) Project.") on the acknowledgment and resolution PDFs (logos embedded via `public_path()`).
+
+## 2026-07-04 — V2 Phase 6: Beel geo + Zone Management
+
+51. Migration adds `latitude`/`longitude` to `beels` and a `zones` table + `zone_id` on `cpius`. `Zone` model; `Cpiu`/`Beel` updated. Beel admin form gains lat/long with a "view on map" Google Maps link (shown on track + grievance detail too).
+52. `ZoneController` CRUD + `admin/masters/zones` view + sidebar link + routes (Super Admin / PMU Admin). `MasterSeeder` seeds 3 zones (Lower/Central/Upper Assam), assigns CPIUs, and adds beel coordinates.
+
+## 2026-07-04 — V2 Phase 7: Tests, verification, docs, git
+
+53. Updated feature tests for the OTP gate + optional Beel; added `OtpAndZoneTest`. `php artisan test` — **24 passed (68 assertions)**.
+54. `php artisan migrate:fresh --seed` clean. Drove the live app: all public + admin pages 200 at desktop/mobile, OTP send/verify/submit gate works, Beel-optional submit works, PDFs show logos + watermark, Zone CRUD works, dashboard charts render. Confirmed no Bootstrap / `bi-` classes remain in views.
+55. Updated `CLAUDE.md` (V2 stack) and this `ACTIONS.md`; committed V2 and pushed to GitHub. **V2 complete.**

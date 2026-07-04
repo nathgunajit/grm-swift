@@ -3,44 +3,43 @@
 @section('heading', 'CPIUs')
 
 @section('content')
-@if ($errors->any())<div class="alert alert-danger small">{{ $errors->first() }}</div>@endif
-<div class="row g-4">
-    <div class="col-md-4">
-        <div class="card shadow-sm"><div class="card-header bg-white">Add CPIU</div>
-            <div class="card-body">
-                <form method="POST" action="{{ route('admin.cpius.store') }}">
-                    @csrf
-                    <div class="mb-2"><label class="form-label small">Name</label><input name="name" class="form-control form-control-sm" required></div>
-                    <div class="mb-2"><label class="form-label small">Code</label><input name="code" class="form-control form-control-sm"></div>
-                    <button class="btn btn-sm btn-grm w-100"><i class="bi bi-plus"></i> Add</button>
-                </form>
-            </div>
-        </div>
+@if ($errors->any())<div class="mb-4 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 px-4 py-2 text-sm">{{ $errors->first() }}</div>@endif
+<div class="grid gap-5 lg:grid-cols-3">
+    <div class="card card-pad">
+        <h3 class="font-semibold text-slate-800 mb-3">Add CPIU</h3>
+        <form method="POST" action="{{ route('admin.cpius.store') }}" class="space-y-3">
+            @csrf
+            <div><label class="label">Name</label><input name="name" class="input" required></div>
+            <div><label class="label">Code</label><input name="code" class="input"></div>
+            <div><label class="label">Zone</label><select name="zone_id" class="input"><option value="">--</option>@foreach ($zones as $z)<option value="{{ $z->id }}">{{ $z->name }}</option>@endforeach</select></div>
+            <button class="btn btn-primary btn-sm w-full"><x-icon name="plus" class="w-4 h-4" /> Add</button>
+        </form>
     </div>
-    <div class="col-md-8">
+    <div class="lg:col-span-2">
         @foreach ($cpius as $c)
             <form id="up-{{ $c->id }}" method="POST" action="{{ route('admin.cpius.update', $c) }}">@csrf @method('PUT')</form>
             <form id="del-{{ $c->id }}" method="POST" action="{{ route('admin.cpius.destroy', $c) }}" onsubmit="return confirm('Delete this CPIU?')">@csrf @method('DELETE')</form>
         @endforeach
-        <div class="card shadow-sm"><div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light"><tr><th>Name</th><th>Code</th><th>Beels</th><th></th></tr></thead>
+        <div class="card overflow-x-auto">
+            <table class="table-grm">
+                <thead><tr><th>Name</th><th>Code</th><th>Zone</th><th>Beels</th><th></th></tr></thead>
                 <tbody>
                     @foreach ($cpius as $c)
                         <tr>
-                            <td><input form="up-{{ $c->id }}" name="name" value="{{ $c->name }}" class="form-control form-control-sm"></td>
-                            <td><input form="up-{{ $c->id }}" name="code" value="{{ $c->code }}" class="form-control form-control-sm" style="width:90px"></td>
+                            <td><input form="up-{{ $c->id }}" name="name" value="{{ $c->name }}" class="input"></td>
+                            <td><input form="up-{{ $c->id }}" name="code" value="{{ $c->code }}" class="input w-24"></td>
+                            <td><select form="up-{{ $c->id }}" name="zone_id" class="input"><option value="">--</option>@foreach ($zones as $z)<option value="{{ $z->id }}" @selected($c->zone_id==$z->id)>{{ $z->name }}</option>@endforeach</select></td>
                             <td>{{ $c->beels_count }}</td>
-                            <td class="text-nowrap">
-                                <button form="up-{{ $c->id }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-check"></i></button>
-                                <button form="del-{{ $c->id }}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            <td class="whitespace-nowrap">
+                                <button form="up-{{ $c->id }}" class="btn btn-sm btn-outline"><x-icon name="check" class="w-4 h-4" /></button>
+                                <button form="del-{{ $c->id }}" class="btn btn-sm btn-danger"><x-icon name="trash" class="w-4 h-4" /></button>
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
-        </div></div>
-        <div class="mt-2">{{ $cpius->links() }}</div>
+        </div>
+        <div class="mt-3">{{ $cpius->links() }}</div>
     </div>
 </div>
 @endsection

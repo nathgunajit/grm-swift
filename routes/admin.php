@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\RevenueCircleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserTypeController;
+use App\Http\Controllers\Admin\ZoneController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
@@ -35,6 +36,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
     // Administration (Super Admin / PMU Admin only)
     Route::middleware('role:super_admin,pmu_admin')->group(function () {
+        Route::resource('zones', ZoneController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::resource('districts', DistrictController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::resource('blocks', BlockController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::resource('revenue-circles', RevenueCircleController::class)->only(['index', 'store', 'update', 'destroy']);

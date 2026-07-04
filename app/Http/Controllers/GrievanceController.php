@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\OtpController;
 use App\Http\Requests\StoreGrievanceRequest;
 use App\Models\Beel;
 use App\Models\Grievance;
@@ -27,8 +28,15 @@ class GrievanceController extends Controller
     public function store(StoreGrievanceRequest $request)
     {
         $data = $request->validated();
+
+        // OTP gate (demo): a non-anonymous submission must have its mobile verified.
+        if (! $request->boolean('is_anonymous') && ! empty($data['mobile'])
+            && ! OtpController::isVerified($request, $data['mobile'])) {
+            return back()->withInput()->withErrors(['mobile' => 'Please verify your mobile number with the OTP before submitting.']);
+        }
+
         $category = GrievanceCategory::find($data['category_id']);
-        $beel = Beel::find($data['beel_id']);
+        $beel = ! empty($data['beel_id']) ? Beel::find($data['beel_id']) : null;
 
         $trackingId = $this->service->generateTrackingId();
 
@@ -45,8 +53,8 @@ class GrievanceController extends Controller
             'email' => $data['email'] ?? null,
             'address' => $data['address'] ?? null,
             'place_village' => $data['place_village'],
-            'beel_id' => $beel->id,
-            'district_id' => $beel->district_id,
+            'beel_id' => $beel?->id,
+            'district_id' => $beel?->district_id,
             'description' => $data['description'],
             'is_anonymous' => $request->boolean('is_anonymous'),
             'is_confidential' => $request->boolean('is_confidential'),

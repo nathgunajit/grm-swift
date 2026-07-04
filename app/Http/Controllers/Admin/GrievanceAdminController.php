@@ -61,7 +61,7 @@ class GrievanceAdminController extends Controller
     {
         $data = $request->validated();
         $category = GrievanceCategory::find($data['category_id']);
-        $beel = Beel::find($data['beel_id']);
+        $beel = ! empty($data['beel_id']) ? Beel::find($data['beel_id']) : null;
         $trackingId = $this->service->generateTrackingId();
 
         $grievance = Grievance::create([
@@ -77,8 +77,8 @@ class GrievanceAdminController extends Controller
             'email' => $data['email'] ?? null,
             'address' => $data['address'] ?? null,
             'place_village' => $data['place_village'],
-            'beel_id' => $beel->id,
-            'district_id' => $beel->district_id,
+            'beel_id' => $beel?->id,
+            'district_id' => $beel?->district_id,
             'description' => $data['description'],
             'is_anonymous' => $request->boolean('is_anonymous'),
             'is_confidential' => $request->boolean('is_confidential'),

@@ -39,33 +39,53 @@
             </a>
 
             {{-- Desktop nav --}}
-            @php $nav = [['home','Home'],['grievance.create','Register Complaint'],['track','Track Complaint'],['process','GRM Process'],['resources','Resources'],['faq','Help & FAQ'],['contact','Contact']]; @endphp
-            <nav class="hidden lg:flex items-center gap-0.5 text-sm">
-                @foreach ($nav as [$route, $label])
+            @php
+                $nav = [
+                    ['home', 'Home', 'home'],
+                    ['track', 'Track Complaint', 'search'],
+                    ['process', 'GRM Process', 'diagram'],
+                    ['resources', 'Resources', 'folder'],
+                    ['faq', 'Help & FAQ', 'question'],
+                    ['contact', 'Contact', 'phone'],
+                ];
+            @endphp
+            <nav class="hidden lg:flex items-center gap-1 text-sm">
+                @foreach ($nav as [$route, $label, $icon])
                     @php $active = request()->routeIs($route); @endphp
-                    <a href="{{ route($route) }}" class="relative rounded-md px-3 py-2 font-medium transition {{ $active ? 'text-white' : 'text-brand-50/90 hover:bg-white/10 hover:text-white' }}">
+                    <a href="{{ route($route) }}" class="group/nav relative flex items-center gap-1.5 rounded-full px-3.5 py-2 font-medium transition-all duration-200 {{ $active ? 'bg-white/15 text-white shadow-inner' : 'text-brand-50/80 hover:bg-white/10 hover:text-white' }}">
+                        <x-icon name="{{ $icon }}" class="w-4 h-4 {{ $active ? 'text-accent-400' : 'text-brand-50/60 group-hover/nav:text-accent-300' }} transition-colors" />
                         {{ $label }}
-                        @if ($active)<span class="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-accent-400"></span>@endif
                     </a>
                 @endforeach
-                <a href="{{ route('login') }}" class="ml-2 inline-flex items-center gap-1.5 rounded-lg bg-white/10 border border-white/25 px-3.5 py-1.5 font-semibold text-white hover:bg-white/20 transition">
-                    <x-icon name="lock" class="w-4 h-4" /> Official Login
+
+                {{-- Primary CTA --}}
+                <a href="{{ route('grievance.create') }}" class="ml-1.5 inline-flex items-center gap-1.5 rounded-full bg-accent-500 px-4 py-2 font-semibold text-white shadow-md shadow-accent-500/30 ring-1 ring-accent-400/50 hover:bg-accent-600 hover:shadow-lg hover:-translate-y-px transition-all">
+                    <x-icon name="pencil" class="w-4 h-4" /> Register Complaint
+                </a>
+                <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 rounded-full border border-white/25 px-3.5 py-2 font-semibold text-white hover:bg-white/10 transition">
+                    <x-icon name="lock" class="w-4 h-4" /> Login
                 </a>
             </nav>
 
             {{-- Mobile toggle --}}
-            <button @click="open = !open" class="lg:hidden text-white p-2 -mr-2" aria-label="Menu">
+            <button @click="open = !open" class="lg:hidden inline-flex items-center justify-center rounded-lg p-2 text-white hover:bg-white/10 transition" aria-label="Menu">
                 <x-icon name="menu" class="w-6 h-6" x-show="!open" />
                 <x-icon name="x" class="w-6 h-6" x-show="open" x-cloak />
             </button>
         </div>
     </div>
     {{-- Mobile menu --}}
-    <div x-show="open" x-cloak class="lg:hidden bg-brand-800 px-4 pb-4 pt-1 space-y-1 border-t border-white/10">
-        @foreach ($nav as [$route, $label])
-            <a href="{{ route($route) }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs($route) ? 'bg-white/15 text-white' : 'text-brand-50 hover:bg-white/10' }}">{{ $label }}</a>
+    <div x-show="open" x-cloak
+         x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
+         class="lg:hidden bg-brand-800/95 backdrop-blur px-3 pb-4 pt-2 space-y-1 border-t border-white/10">
+        <a href="{{ route('grievance.create') }}" class="flex items-center gap-2.5 rounded-lg bg-accent-500 px-3 py-2.5 font-semibold text-white shadow-md"><x-icon name="pencil" class="w-5 h-5" /> Register Complaint</a>
+        @foreach ($nav as [$route, $label, $icon])
+            @php $active = request()->routeIs($route); @endphp
+            <a href="{{ route($route) }}" class="flex items-center gap-2.5 rounded-lg px-3 py-2.5 font-medium {{ $active ? 'bg-white/15 text-white' : 'text-brand-50/90 hover:bg-white/10' }}">
+                <x-icon name="{{ $icon }}" class="w-5 h-5 {{ $active ? 'text-accent-400' : 'text-brand-50/60' }}" /> {{ $label }}
+            </a>
         @endforeach
-        <a href="{{ route('login') }}" class="mt-1 flex items-center gap-1.5 rounded-md bg-accent-500 px-3 py-2 font-semibold text-white"><x-icon name="lock" class="w-4 h-4" /> Official Login</a>
+        <a href="{{ route('login') }}" class="flex items-center gap-2.5 rounded-lg border border-white/20 px-3 py-2.5 font-semibold text-white hover:bg-white/10"><x-icon name="lock" class="w-5 h-5" /> Official Login</a>
     </div>
 </header>
 

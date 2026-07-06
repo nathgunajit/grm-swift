@@ -28,13 +28,13 @@
     <div class="mx-auto max-w-7xl px-4">
         <div class="flex h-16 items-center justify-between gap-4">
             {{-- Portal title --}}
-            <a href="{{ route('home') }}" class="flex items-center gap-3 text-white group">
+            <a href="{{ route('home') }}" class="flex items-center gap-3 text-white group shrink-0">
                 <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/20 shrink-0">
                     <x-icon name="shield-check" class="w-6 h-6 text-accent-400" />
                 </span>
-                <span class="leading-tight">
+                <span class="leading-tight whitespace-nowrap">
                     <span class="block font-display text-base sm:text-xl font-extrabold">SWIFT GRM Portal</span>
-                    <span class="hidden sm:block text-[11px] text-brand-50/70">Grievance Redressal Mechanism · Assam SWIFT Project</span>
+                    <span class="hidden sm:block xl:whitespace-nowrap text-[11px] text-brand-50/70">Grievance Redressal Mechanism · Assam SWIFT Project</span>
                 </span>
             </a>
 
@@ -49,26 +49,26 @@
                     ['contact', 'Contact', 'phone'],
                 ];
             @endphp
-            <nav class="hidden lg:flex items-center gap-1 text-sm">
+            <nav class="hidden xl:flex flex-nowrap items-center gap-1 text-sm">
                 @foreach ($nav as [$route, $label, $icon])
                     @php $active = request()->routeIs($route); @endphp
-                    <a href="{{ route($route) }}" class="group/nav relative flex items-center gap-1.5 rounded-full px-3.5 py-2 font-medium transition-all duration-200 {{ $active ? 'bg-white/15 text-white shadow-inner' : 'text-brand-50/80 hover:bg-white/10 hover:text-white' }}">
-                        <x-icon name="{{ $icon }}" class="w-4 h-4 {{ $active ? 'text-accent-400' : 'text-brand-50/60 group-hover/nav:text-accent-300' }} transition-colors" />
+                    <a href="{{ route($route) }}" class="group/nav relative flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 font-medium transition-all duration-200 {{ $active ? 'bg-white/15 text-white shadow-inner' : 'text-brand-50/80 hover:bg-white/10 hover:text-white' }}">
+                        <x-icon name="{{ $icon }}" class="w-4 h-4 shrink-0 {{ $active ? 'text-accent-400' : 'text-brand-50/60 group-hover/nav:text-accent-300' }} transition-colors" />
                         {{ $label }}
                     </a>
                 @endforeach
 
                 {{-- Primary CTA --}}
-                <a href="{{ route('grievance.create') }}" class="ml-1.5 inline-flex items-center gap-1.5 rounded-full bg-accent-500 px-4 py-2 font-semibold text-white shadow-md shadow-accent-500/30 ring-1 ring-accent-400/50 hover:bg-accent-600 hover:shadow-lg hover:-translate-y-px transition-all">
-                    <x-icon name="pencil" class="w-4 h-4" /> Register Complaint
+                <a href="{{ route('grievance.create') }}" class="ml-1.5 inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-accent-500 px-4 py-2 font-semibold text-white shadow-md shadow-accent-500/30 ring-1 ring-accent-400/50 hover:bg-accent-600 hover:shadow-lg hover:-translate-y-px transition-all">
+                    <x-icon name="pencil" class="w-4 h-4 shrink-0" /> Register Complaint
                 </a>
-                <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 rounded-full border border-white/25 px-3.5 py-2 font-semibold text-white hover:bg-white/10 transition">
-                    <x-icon name="lock" class="w-4 h-4" /> Login
+                <a href="{{ route('login') }}" class="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-white/25 px-3 py-2 font-semibold text-white hover:bg-white/10 transition">
+                    <x-icon name="lock" class="w-4 h-4 shrink-0" /> Login
                 </a>
             </nav>
 
             {{-- Mobile toggle --}}
-            <button @click="open = !open" class="lg:hidden inline-flex items-center justify-center rounded-lg p-2 text-white hover:bg-white/10 transition" aria-label="Menu">
+            <button @click="open = !open" class="xl:hidden inline-flex items-center justify-center rounded-lg p-2 text-white hover:bg-white/10 transition" aria-label="Menu">
                 <x-icon name="menu" class="w-6 h-6" x-show="!open" />
                 <x-icon name="x" class="w-6 h-6" x-show="open" x-cloak />
             </button>
@@ -77,7 +77,7 @@
     {{-- Mobile menu --}}
     <div x-show="open" x-cloak
          x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
-         class="lg:hidden bg-brand-800/95 backdrop-blur px-3 pb-4 pt-2 space-y-1 border-t border-white/10">
+         class="xl:hidden bg-brand-800/95 backdrop-blur px-3 pb-4 pt-2 space-y-1 border-t border-white/10">
         <a href="{{ route('grievance.create') }}" class="flex items-center gap-2.5 rounded-lg bg-accent-500 px-3 py-2.5 font-semibold text-white shadow-md"><x-icon name="pencil" class="w-5 h-5" /> Register Complaint</a>
         @foreach ($nav as [$route, $label, $icon])
             @php $active = request()->routeIs($route); @endphp

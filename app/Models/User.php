@@ -64,4 +64,29 @@ class User extends Authenticatable
         $slugs = (array) $slugs;
         return in_array($this->role(), $slugs, true);
     }
+
+    /**
+     * Grievance actions each role may perform (from the module-visibility spec).
+     * Actions: manual_entry, review, comment, escalate, resolve.
+     */
+    public const ROLE_GRIEVANCE_ACTIONS = [
+        'beel_animator'   => ['manual_entry', 'review', 'comment', 'escalate'],
+        'bdc_facilitator' => ['review', 'comment', 'escalate'],
+        'ssgc'            => ['manual_entry', 'review', 'comment', 'escalate'],
+        'dfdo'            => ['review', 'comment', 'escalate', 'resolve'],
+        'cpiu_officer'    => ['review', 'comment', 'escalate', 'resolve'],
+        'piu_officer'     => ['manual_entry', 'review', 'comment', 'resolve'],
+        'pmu_admin'       => [], // view / monitoring only
+        'super_admin'     => ['manual_entry', 'review', 'comment', 'escalate', 'resolve'],
+    ];
+
+    public function allowedGrievanceActions(): array
+    {
+        return self::ROLE_GRIEVANCE_ACTIONS[$this->role()] ?? [];
+    }
+
+    public function canGrievance(string $action): bool
+    {
+        return in_array($action, $this->allowedGrievanceActions(), true);
+    }
 }

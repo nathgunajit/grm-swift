@@ -8,15 +8,15 @@ class Cpiu extends Model
 {
     protected $table = 'cpius';
 
-    protected $fillable = ['name', 'code', 'zone_id', 'is_active'];
+    protected $fillable = ['name', 'code', 'is_active'];
 
     public function beels()
     {
         return $this->hasMany(Beel::class);
     }
 
-    public function zone()
+    public function districts()
     {
-        return $this->belongsTo(Zone::class);
+        return $this->hasMany(District::class);
     }
 }

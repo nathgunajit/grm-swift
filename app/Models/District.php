@@ -6,7 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class District extends Model
 {
-    protected $fillable = ['name', 'code', 'is_active'];
+    protected $fillable = ['name', 'code', 'cpiu_id', 'is_active'];
+
+    public function cpiu()
+    {
+        return $this->belongsTo(Cpiu::class);
+    }
 
     public function blocks()
     {

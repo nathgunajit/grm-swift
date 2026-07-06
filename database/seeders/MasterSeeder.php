@@ -11,7 +11,6 @@ use App\Models\District;
 use App\Models\GrievanceCategory;
 use App\Models\RevenueCircle;
 use App\Models\UserType;
-use App\Models\Zone;
 use Illuminate\Database\Seeder;
 
 class MasterSeeder extends Seeder
@@ -51,37 +50,30 @@ class MasterSeeder extends Seeder
         }
 
         // --- Sample Assam districts, CPIUs, blocks, beels ---
-        $districtNames = ['Kamrup', 'Nagaon', 'Barpeta', 'Morigaon', 'Dhubri'];
-        $districts = [];
-        foreach ($districtNames as $i => $name) {
-            $districts[$name] = District::updateOrCreate(
+        // CPIUs
+        $cpiuNames = ['CPIU Guwahati', 'CPIU Nagaon', 'CPIU Barpeta'];
+        $cpius = [];
+        foreach ($cpiuNames as $i => $name) {
+            $cpius[$name] = Cpiu::updateOrCreate(
                 ['name' => $name],
-                ['code' => 'D'.str_pad($i + 1, 2, '0', STR_PAD_LEFT)]
+                ['code' => 'C'.str_pad($i + 1, 2, '0', STR_PAD_LEFT)]
             );
         }
 
-        // Zones (each groups one or more CPIUs)
-        $zoneData = [
-            'Lower Assam Zone' => 'Z01',
-            'Central Assam Zone' => 'Z02',
-            'Upper Assam Zone' => 'Z03',
+        // Districts (each belongs to one CPIU)
+        $districtData = [
+            'Kamrup' => 'CPIU Guwahati',
+            'Nagaon' => 'CPIU Nagaon',
+            'Barpeta' => 'CPIU Barpeta',
+            'Morigaon' => 'CPIU Nagaon',
+            'Dhubri' => 'CPIU Barpeta',
         ];
-        $zones = [];
-        foreach ($zoneData as $name => $code) {
-            $zones[$name] = Zone::updateOrCreate(['name' => $name], ['code' => $code, 'description' => 'SWIFT operational zone.']);
-        }
-
-        $cpiuData = [
-            'CPIU Guwahati' => 'Lower Assam Zone',
-            'CPIU Nagaon' => 'Central Assam Zone',
-            'CPIU Barpeta' => 'Lower Assam Zone',
-        ];
-        $cpius = [];
+        $districts = [];
         $i = 0;
-        foreach ($cpiuData as $name => $zoneName) {
-            $cpius[$name] = Cpiu::updateOrCreate(
+        foreach ($districtData as $name => $cpiuName) {
+            $districts[$name] = District::updateOrCreate(
                 ['name' => $name],
-                ['code' => 'C'.str_pad(++$i, 2, '0', STR_PAD_LEFT), 'zone_id' => $zones[$zoneName]->id]
+                ['code' => 'D'.str_pad(++$i, 2, '0', STR_PAD_LEFT), 'cpiu_id' => $cpius[$cpiuName]->id]
             );
         }
 

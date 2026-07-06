@@ -41,7 +41,11 @@ Public User (no login), Beel Animator, BDC Facilitator, SSGC, DFDO, CPIU Officer
 
 ## Database (main tables)
 
-Masters: `zones` (V2 — groups CPIUs), `districts`, `blocks`, `revenue_circles`, `cpius` (V2: `zone_id`), `beels` (V2: `latitude`/`longitude`). Users: `user_types`, `users`, `user_assignments`. Grievances: `grievance_categories` (9 codes from the manual), `grievances`, `grievance_documents`, `grievance_actions` (audit timeline — every state change writes a row), `grievance_feedback`. Committees: `committees`, `committee_members`.
+Masters: `districts` (V3: `cpiu_id` — each district belongs to one CPIU), `blocks`, `revenue_circles`, `cpius`, `beels` (`latitude`/`longitude`). **Zones were removed in V3.** Users: `user_types`, `users`, `user_assignments`. Grievances: `grievance_categories` (9 codes from the manual), `grievances`, `grievance_documents`, `grievance_actions` (audit timeline — every state change writes a row), `grievance_feedback`. Committees: `committees`, `committee_members`.
+
+**Role → grievance actions (V3)** — enforced in `GrievanceAdminController` and rendered in `admin/grievances/show.blade.php` via `User::canGrievance($action)` / `User::ROLE_GRIEVANCE_ACTIONS`:
+- Beel Animator: manual_entry, review, comment, escalate · BDC Facilitator: review, comment, escalate · SSGC: manual_entry, review, comment, escalate · DFDO / CPIU Officer: review, comment, escalate, resolve · PIU Officer: manual_entry, review, comment, resolve · PMU Admin: view/monitor only · Super Admin: all.
+- On escalate, the officer picks the target Level and Team (committee for that level & district). CPIUs own districts (assign in the CPIU master; taken districts are disabled). Committee member entry autocompletes employees via `admin/employees/search` and fills designation. Reports include an on-time-vs-delayed resolution breakdown.
 
 ## Run locally
 
@@ -64,7 +68,7 @@ Seeded Super Admin: `admin@grmswift.local` / `Admin@123` (see ACTIONS.md; sample
 
 ## Current status (2026-07-04)
 
-**V1 and V2 are complete** and pushed to GitHub (`github.com/nathgunajit/grm-swift`). V1 delivered the full GRM portal (Blade + Bootstrap). V2 (Phase 2 enhancement) redesigned the entire UI on **Tailwind CSS v4** (Bootstrap removed), added dashboard charts, three-logo branding + a watermark on PDFs, demo mobile-OTP verification, made Beel optional on registration, added Beel latitude/longitude, and added **Zone management** (zones grouping CPIUs). See `ACTIONS.md` for the full step-by-step log.
+**V1, V2 and V3 are complete** and pushed to GitHub (`github.com/nathgunajit/grm-swift`). V1 delivered the full GRM portal (Blade + Bootstrap). V2 redesigned the UI on **Tailwind CSS v4**, added dashboard charts, three-logo PDF branding + watermark, demo mobile-OTP, optional Beel on registration, and Beel lat/long. V3 (module-visibility enhancement) added **role-based grievance actions** (per-role Take-Action + escalate with Level/Team/District), **removed Zone management** (CPIUs now own districts via `districts.cpiu_id`), made all Beel fields visible, added an **employee autocomplete** to committee member entry, colour-coded the grievance-list Due column, added an **on-time-vs-delayed reports** section, and changed User Types (description textarea, "Users (Nos)"). See `ACTIONS.md` for the full step-by-step log.
 
 ## Conventions
 

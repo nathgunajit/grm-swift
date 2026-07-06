@@ -81,17 +81,26 @@
     </div>
 
     <div class="space-y-5">
-        @if ($canAct)
-        <div class="card card-pad" x-data="{ tab: 'comment' }">
-            <h3 class="font-semibold text-slate-800 mb-3">Take Action</h3>
+        @php
+            $me = auth()->user();
+            $canComment  = $canAct && $me->canGrievance('comment');
+            $canEscalate = $canAct && $me->canGrievance('escalate') && $grievance->current_level < 3;
+            $canResolve  = $canAct && $me->canGrievance('resolve');
+            $hasActions  = $canComment || $canEscalate || $canResolve;
+            $firstTab    = $canComment ? 'comment' : ($canEscalate ? 'escalate' : ($canResolve ? 'resolve' : ''));
+        @endphp
+        @if ($hasActions)
+        <div class="card card-pad" x-data="{ tab: '{{ $firstTab }}' }">
+            <h3 class="font-semibold text-slate-800 mb-3">Take Action <span class="text-xs font-normal text-slate-400">· {{ $me->userType?->name }}</span></h3>
             <div class="flex rounded-lg bg-slate-100 p-1 text-sm mb-3">
-                <button @click="tab='comment'" :class="tab==='comment' ? 'bg-white shadow-sm text-brand-700' : 'text-slate-500'" class="flex-1 rounded-md py-1.5 font-medium">Comment</button>
-                <button @click="tab='escalate'" :class="tab==='escalate' ? 'bg-white shadow-sm text-brand-700' : 'text-slate-500'" class="flex-1 rounded-md py-1.5 font-medium">Escalate</button>
-                <button @click="tab='resolve'" :class="tab==='resolve' ? 'bg-white shadow-sm text-brand-700' : 'text-slate-500'" class="flex-1 rounded-md py-1.5 font-medium">Resolve</button>
+                @if ($canComment)<button @click="tab='comment'" :class="tab==='comment' ? 'bg-white shadow-sm text-brand-700' : 'text-slate-500'" class="flex-1 rounded-md py-1.5 font-medium">Comment</button>@endif
+                @if ($canEscalate)<button @click="tab='escalate'" :class="tab==='escalate' ? 'bg-white shadow-sm text-brand-700' : 'text-slate-500'" class="flex-1 rounded-md py-1.5 font-medium">Escalate</button>@endif
+                @if ($canResolve)<button @click="tab='resolve'" :class="tab==='resolve' ? 'bg-white shadow-sm text-brand-700' : 'text-slate-500'" class="flex-1 rounded-md py-1.5 font-medium">Resolve</button>@endif
             </div>
 
+            @if ($canComment)
             <div x-show="tab==='comment'">
-                @if ($grievance->status === 'registered')
+                @if ($grievance->status === 'registered' && $me->canGrievance('review'))
                     <form method="POST" action="{{ route('admin.grievances.review', $grievance) }}" class="mb-2">
                         @csrf<button class="btn btn-sm btn-outline w-full"><x-icon name="hourglass" class="w-4 h-4" /> Mark Under Review</button>
                     </form>
@@ -102,18 +111,43 @@
                     <button class="btn btn-sm btn-primary w-full"><x-icon name="chat" class="w-4 h-4" /> Add Comment</button>
                 </form>
             </div>
+            @endif
+
+            @if ($canEscalate)
             <div x-show="tab==='escalate'" x-cloak>
-                @if ($grievance->current_level < 3)
-                    <form method="POST" action="{{ route('admin.grievances.escalate', $grievance) }}">
-                        @csrf
-                        <p class="text-sm text-slate-500 mb-2">Escalate to Level {{ $grievance->current_level + 1 }} (next GRC tier).</p>
-                        <textarea name="remarks" class="input mb-2" rows="3" placeholder="Reason for escalation"></textarea>
-                        <button class="btn btn-sm w-full bg-amber-500 text-white hover:bg-amber-600"><x-icon name="arrow-up" class="w-4 h-4" /> Escalate to Level {{ $grievance->current_level + 1 }}</button>
-                    </form>
-                @else
-                    <p class="text-sm text-slate-500">Already at the highest level (PIU). Cannot escalate further.</p>
+                <form method="POST" action="{{ route('admin.grievances.escalate', $grievance) }}">
+                    @csrf
+                    <label class="label">Escalate to Level</label>
+                    <select name="to_level" class="input mb-2">
+                        @for ($lvl = $grievance->current_level + 1; $lvl <= 3; $lvl++)
+                            <option value="{{ $lvl }}">Level {{ $lvl }} — {{ $lvl == 2 ? 'Cluster / CPIU' : 'PIU' }}</option>
+                        @endfor
+                    </select>
+                    <label class="label">Team / Committee <span class="text-xs text-slate-400">· District: {{ $grievance->district?->name ?? '—' }}</span></label>
+                    <select name="committee_id" class="input mb-2">
+                        <option value="">-- Not specified --</option>
+                        @foreach ($escalationTeams as $lvl => $teams)
+                            @foreach ($teams as $team)
+                                <option value="{{ $team->id }}">L{{ $lvl }} — {{ $team->name }}</option>
+                            @endforeach
+                        @endforeach
+                    </select>
+                    <textarea name="remarks" class="input mb-2" rows="2" placeholder="Reason for escalation"></textarea>
+                    <button class="btn btn-sm w-full bg-amber-500 text-white hover:bg-amber-600"><x-icon name="arrow-up" class="w-4 h-4" /> Escalate</button>
+                </form>
+                @php $flatTeams = collect($escalationTeams)->flatten(1); @endphp
+                @if ($flatTeams->isNotEmpty())
+                    <div class="mt-3 rounded-lg bg-slate-50 p-3 text-xs text-slate-500">
+                        <p class="font-semibold text-slate-600 mb-1">GRC teams for this district</p>
+                        @foreach ($flatTeams as $team)
+                            <p>L{{ $team->level }} · <span class="text-slate-700">{{ $team->name }}</span> — {{ $team->members->count() }} members ({{ $team->womenPercentage() }}% women)</p>
+                        @endforeach
+                    </div>
                 @endif
             </div>
+            @endif
+
+            @if ($canResolve)
             <div x-show="tab==='resolve'" x-cloak>
                 <form method="POST" action="{{ route('admin.grievances.resolve', $grievance) }}">
                     @csrf
@@ -121,9 +155,16 @@
                     <button class="btn btn-sm btn-success w-full"><x-icon name="check-circle" class="w-4 h-4" /> Mark Resolved</button>
                 </form>
             </div>
+            @endif
         </div>
         @else
-            <div class="rounded-lg bg-slate-100 text-slate-600 px-4 py-3 text-sm flex items-center gap-2"><x-icon name="lock" class="w-4 h-4" /> This grievance is closed. No further actions available.</div>
+            <div class="rounded-lg bg-slate-100 text-slate-600 px-4 py-3 text-sm flex items-center gap-2">
+                <x-icon name="lock" class="w-4 h-4" />
+                @if (! $canAct) This grievance is closed. No further actions available.
+                @elseif (empty($me->allowedGrievanceActions())) Monitoring access — you can view this grievance but cannot take actions.
+                @else No actions available for your role at this level.
+                @endif
+            </div>
         @endif
 
         <div class="card card-pad">

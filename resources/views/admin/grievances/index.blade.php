@@ -47,7 +47,13 @@
                     <td class="text-slate-500">{{ $g->beel?->name ?? '—' }}</td>
                     <td><span class="badge bg-slate-100 text-slate-600">L{{ $g->current_level }}</span></td>
                     <td><x-status-badge :status="$g->status" /></td>
-                    <td class="{{ $g->isOverdue() ? 'text-rose-600 font-medium' : 'text-slate-500' }}">{{ optional($g->due_at)->format('d M Y') ?? '—' }}</td>
+                    <td>
+                        @php [$dueClass, $dueLabel] = $g->dueBadge(); @endphp
+                        <div class="flex items-center gap-2">
+                            <span class="badge {{ $dueClass }}">{{ $dueLabel }}</span>
+                            <span class="text-xs text-slate-400">{{ optional($g->due_at)->format('d M Y') }}</span>
+                        </div>
+                    </td>
                     <td><a href="{{ route('admin.grievances.show', $g) }}" class="btn btn-sm btn-primary"><x-icon name="eye" class="w-4 h-4" /></a></td>
                 </tr>
             @empty
@@ -55,6 +61,13 @@
             @endforelse
         </tbody>
     </table>
+</div>
+<div class="mt-3 flex flex-wrap items-center gap-4 text-xs text-slate-500">
+    <span class="font-medium text-slate-600">Due:</span>
+    <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span> On time (&gt;3 days)</span>
+    <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span> Approaching (≤3 days)</span>
+    <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span> Overdue</span>
+    <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-slate-400"></span> Resolved / Done</span>
 </div>
 <div class="mt-4">{{ $grievances->links() }}</div>
 @endsection

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreGrievanceRequest;
 use App\Models\Beel;
+use App\Models\Committee;
 use App\Models\Grievance;
 use App\Models\GrievanceCategory;
 use App\Services\GrievanceService;
@@ -46,11 +47,23 @@ class GrievanceAdminController extends Controller
         $this->authorizeView($request, $grievance);
         $grievance->load(['category', 'beel', 'district', 'documents', 'actions.user', 'feedback']);
 
-        return view('admin.grievances.show', compact('grievance'));
+        // Committees (teams) available at higher levels for this grievance's district,
+        // shown when escalating.
+        $escalationTeams = [];
+        for ($lvl = $grievance->current_level + 1; $lvl <= 3; $lvl++) {
+            $escalationTeams[$lvl] = Committee::with('members')
+                ->where('level', $lvl)
+                ->where(fn ($q) => $q->whereNull('district_id')->orWhere('district_id', $grievance->district_id))
+                ->get();
+        }
+
+        return view('admin.grievances.show', compact('grievance', 'escalationTeams'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
+        abort_unless($request->user()->canGrievance('manual_entry'), 403);
+
         return view('admin.grievances.create', [
             'categories' => GrievanceCategory::where('is_active', true)->orderBy('code')->get(),
             'beels' => Beel::where('is_active', true)->orderBy('name')->get(),
@@ -59,6 +72,7 @@ class GrievanceAdminController extends Controller
 
     public function store(StoreGrievanceRequest $request)
     {
+        abort_unless($request->user()->canGrievance('manual_entry'), 403);
         $data = $request->validated();
         $category = GrievanceCategory::find($data['category_id']);
         $beel = ! empty($data['beel_id']) ? Beel::find($data['beel_id']) : null;
@@ -109,6 +123,7 @@ class GrievanceAdminController extends Controller
     public function review(Request $request, Grievance $grievance)
     {
         $this->authorizeView($request, $grievance);
+        abort_unless($request->user()->canGrievance('review'), 403);
         $request->validate(['remarks' => ['nullable', 'string', 'max:1000']]);
 
         if ($grievance->status === 'registered') {
@@ -122,6 +137,7 @@ class GrievanceAdminController extends Controller
     public function comment(Request $request, Grievance $grievance)
     {
         $this->authorizeView($request, $grievance);
+        abort_unless($request->user()->canGrievance('comment'), 403);
         $request->validate(['remarks' => ['required', 'string', 'max:1000']]);
         $this->service->logAction($grievance, 'commented', $request->user()->id, $request->input('remarks'), $grievance->current_level, $grievance->current_level);
 
@@ -131,17 +147,30 @@ class GrievanceAdminController extends Controller
     public function escalate(Request $request, Grievance $grievance)
     {
         $this->authorizeView($request, $grievance);
-        $request->validate(['remarks' => ['nullable', 'string', 'max:1000']]);
+        abort_unless($request->user()->canGrievance('escalate'), 403);
+        $data = $request->validate([
+            'remarks' => ['nullable', 'string', 'max:1000'],
+            'to_level' => ['nullable', 'integer', 'between:2,3'],
+            'committee_id' => ['nullable', 'exists:committees,id'],
+        ]);
 
-        $ok = $this->service->escalate($grievance, $request->user()->id, $request->input('remarks') ?: 'Escalated to next level.');
+        $toLevel = $data['to_level'] ?? $grievance->current_level + 1;
+        $teamNote = null;
+        if (! empty($data['committee_id'])) {
+            $team = Committee::find($data['committee_id']);
+            $teamNote = $team ? '[Assigned team: '.$team->name.($grievance->district ? ', '.$grievance->district->name : '').']' : null;
+        }
+
+        $ok = $this->service->escalate($grievance, $request->user()->id, $data['remarks'] ?? null, $toLevel, $teamNote);
 
         return back()->with($ok ? 'success' : 'error',
-            $ok ? 'Grievance escalated to '.$grievance->fresh()->levelLabel().'.' : 'Already at the highest level (PIU); cannot escalate further.');
+            $ok ? 'Grievance escalated to '.$grievance->fresh()->levelLabel().'.' : 'Cannot escalate further (already at the highest level).');
     }
 
     public function resolve(Request $request, Grievance $grievance)
     {
         $this->authorizeView($request, $grievance);
+        abort_unless($request->user()->canGrievance('resolve'), 403);
         $data = $request->validate(['resolution' => ['required', 'string', 'min:5', 'max:2000']]);
 
         $this->service->resolve($grievance, $data['resolution'], $request->user()->id);

@@ -21,14 +21,13 @@
 
             <p class="px-3 pt-4 pb-1 text-[11px] uppercase tracking-wider text-brand-100/50">Grievances</p>
             <a href="{{ route('admin.grievances.index') }}" class="sidebar-link {{ request()->routeIs('admin.grievances.*') ? 'active' : '' }}"><x-icon name="inbox" class="w-5 h-5" /> Grievances</a>
-            @if (in_array($role, ['beel_animator','bdc_facilitator','ssgc','dfdo','super_admin','pmu_admin']))
+            @if (auth()->user()->canGrievance('manual_entry'))
                 <a href="{{ route('admin.grievances.create') }}" class="sidebar-link"><x-icon name="plus" class="w-5 h-5" /> Manual Entry</a>
             @endif
             <a href="{{ route('admin.reports.index') }}" class="sidebar-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}"><x-icon name="chart" class="w-5 h-5" /> Reports</a>
 
             @if (in_array($role, ['super_admin','pmu_admin']))
                 <p class="px-3 pt-4 pb-1 text-[11px] uppercase tracking-wider text-brand-100/50">Administration</p>
-                <a href="{{ route('admin.zones.index') }}" class="sidebar-link {{ request()->routeIs('admin.zones.*') ? 'active' : '' }}"><x-icon name="diagram" class="w-5 h-5" /> Zones</a>
                 <a href="{{ route('admin.districts.index') }}" class="sidebar-link {{ request()->routeIs('admin.districts.*') ? 'active' : '' }}"><x-icon name="geo" class="w-5 h-5" /> Districts</a>
                 <a href="{{ route('admin.blocks.index') }}" class="sidebar-link {{ request()->routeIs('admin.blocks.*') ? 'active' : '' }}"><x-icon name="grid" class="w-5 h-5" /> Blocks</a>
                 <a href="{{ route('admin.revenue-circles.index') }}" class="sidebar-link {{ request()->routeIs('admin.revenue-circles.*') ? 'active' : '' }}"><x-icon name="grid" class="w-5 h-5" /> Revenue Circles</a>

@@ -52,10 +52,22 @@
                             </tbody>
                         </table>
                     </div>
-                    <form method="POST" action="{{ route('admin.committees.members.add', $c) }}" class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-end">
+                    <form method="POST" action="{{ route('admin.committees.members.add', $c) }}" class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-end" x-data="employeePicker()">
                         @csrf
-                        <div class="sm:col-span-4"><input name="name" class="input" placeholder="Member name" required></div>
-                        <div class="sm:col-span-3"><input name="designation" class="input" placeholder="Designation"></div>
+                        {{-- Member name with employee autocomplete --}}
+                        <div class="sm:col-span-4 relative">
+                            <input name="name" class="input" placeholder="Member name" autocomplete="off" required
+                                   x-model="name" @input.debounce.300ms="search()" @focus="search()" @click.away="open=false">
+                            <div x-show="open && results.length" x-cloak class="absolute z-20 mt-1 w-full max-h-52 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg">
+                                <template x-for="emp in results" :key="emp.name + emp.empid">
+                                    <button type="button" @click="pick(emp)" class="flex w-full flex-col items-start px-3 py-2 text-left hover:bg-slate-50">
+                                        <span class="text-sm font-medium text-slate-700" x-text="emp.name"></span>
+                                        <span class="text-xs text-slate-400" x-text="[emp.designation, emp.empid].filter(Boolean).join(' · ')"></span>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                        <div class="sm:col-span-3"><input name="designation" class="input" placeholder="Designation" x-model="designation"></div>
                         <div class="sm:col-span-3"><select name="role" class="input">
                             <option value="chairperson">Chairperson</option><option value="convenor">Convenor</option>
                             <option value="member" selected>Member</option><option value="rapporteur">Rapporteur</option>
@@ -70,4 +82,29 @@
         @endforelse
     </div>
 </div>
+
+@push('scripts')
+<script>
+function employeePicker() {
+    return {
+        name: '', designation: '', results: [], open: false,
+        async search() {
+            if (this.name.trim().length < 1) { this.results = []; this.open = false; return; }
+            try {
+                const res = await fetch('{{ route('admin.employees.search') }}?q=' + encodeURIComponent(this.name), {
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                this.results = await res.json();
+                this.open = true;
+            } catch (e) { this.results = []; this.open = false; }
+        },
+        pick(emp) {
+            this.name = emp.name;
+            if (emp.designation) this.designation = emp.designation;
+            this.open = false;
+        }
+    }
+}
+</script>
+@endpush
 @endsection

@@ -27,22 +27,20 @@
         @endforeach
         <div class="card overflow-x-auto">
             <table class="table-grm">
-                <thead><tr><th>Name</th><th>District</th><th>CPIU</th><th>Location</th><th></th></tr></thead>
+                <thead><tr><th>Name</th><th>District</th><th>Block</th><th>CPIU</th><th>Latitude</th><th>Longitude</th><th>Map</th><th></th></tr></thead>
                 <tbody>
                     @foreach ($beels as $b)
                         <tr>
                             <td><input form="up-{{ $b->id }}" name="name" value="{{ $b->name }}" class="input min-w-32"></td>
                             <td><select form="up-{{ $b->id }}" name="district_id" class="input"><option value="">--</option>@foreach ($districts as $d)<option value="{{ $d->id }}" @selected($b->district_id==$d->id)>{{ $d->name }}</option>@endforeach</select></td>
+                            <td><select form="up-{{ $b->id }}" name="block_id" class="input"><option value="">--</option>@foreach ($blocks as $bl)<option value="{{ $bl->id }}" @selected($b->block_id==$bl->id)>{{ $bl->name }}</option>@endforeach</select></td>
                             <td><select form="up-{{ $b->id }}" name="cpiu_id" class="input"><option value="">--</option>@foreach ($cpius as $c)<option value="{{ $c->id }}" @selected($b->cpiu_id==$c->id)>{{ $c->name }}</option>@endforeach</select></td>
+                            <td><input form="up-{{ $b->id }}" name="latitude" value="{{ $b->latitude }}" class="input w-24" placeholder="lat"></td>
+                            <td><input form="up-{{ $b->id }}" name="longitude" value="{{ $b->longitude }}" class="input w-24" placeholder="lng"></td>
                             <td>
-                                <input form="up-{{ $b->id }}" type="hidden" name="block_id" value="{{ $b->block_id }}">
-                                <div class="flex items-center gap-1">
-                                    <input form="up-{{ $b->id }}" name="latitude" value="{{ $b->latitude }}" class="input w-24" placeholder="lat">
-                                    <input form="up-{{ $b->id }}" name="longitude" value="{{ $b->longitude }}" class="input w-24" placeholder="lng">
-                                    @if ($b->latitude && $b->longitude)
-                                        <a href="https://www.google.com/maps?q={{ $b->latitude }},{{ $b->longitude }}" target="_blank" class="text-brand-600" title="View on map"><x-icon name="map-pin" class="w-5 h-5" /></a>
-                                    @endif
-                                </div>
+                                @if ($b->latitude && $b->longitude)
+                                    <a href="https://www.google.com/maps?q={{ $b->latitude }},{{ $b->longitude }}" target="_blank" class="text-brand-600" title="View on map"><x-icon name="map-pin" class="w-5 h-5" /></a>
+                                @else <span class="text-slate-300">—</span> @endif
                             </td>
                             <td class="whitespace-nowrap">
                                 <button form="up-{{ $b->id }}" class="btn btn-sm btn-outline"><x-icon name="check" class="w-4 h-4" /></button>

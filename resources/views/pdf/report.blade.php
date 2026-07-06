@@ -40,6 +40,13 @@
         </tr>
     </table>
 
+    <h4>Resolution Timeliness</h4>
+    <table><tr><th>Metric</th><th>Count</th></tr>
+        <tr><td>Resolved on time</td><td>{{ $onTime }}</td></tr>
+        <tr><td>Resolved late (delayed)</td><td>{{ $delayedResolved }}</td></tr>
+        <tr><td>Open &amp; overdue</td><td>{{ $openOverdue }}</td></tr>
+    </table>
+
     <h4>By Status</h4>
     <table><tr><th>Status</th><th>Count</th></tr>
         @foreach ($byStatus as $k => $v)<tr><td>{{ $statusLabels[$k] ?? $k }}</td><td>{{ $v }}</td></tr>@endforeach

@@ -95,9 +95,10 @@ class GrievanceWorkflowTest extends TestCase
     public function test_officer_can_resolve_through_http(): void
     {
         $grievance = $this->makeGrievance();
-        $ssgc = User::where('email', 'ssgc@grmswift.local')->first(); // Kamrup district
+        // DFDO is a resolver role in the V3 role matrix (SSGC only escalates).
+        $dfdo = User::where('email', 'dfdo@grmswift.local')->first(); // Kamrup district
 
-        $this->actingAs($ssgc)
+        $this->actingAs($dfdo)
             ->post(route('admin.grievances.resolve', $grievance), ['resolution' => 'Resolved via HTTP endpoint test.'])
             ->assertRedirect();
 

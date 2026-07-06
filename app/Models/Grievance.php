@@ -80,6 +80,29 @@ class Grievance extends Model
             && $this->due_at->isPast();
     }
 
+    /**
+     * Colour-coded due status for the grievance list.
+     * Returns [tailwind classes, label].
+     */
+    public function dueBadge(): array
+    {
+        if (in_array($this->status, ['resolved', 'closed'], true)) {
+            return ['bg-slate-100 text-slate-500', 'Done'];
+        }
+        if (! $this->due_at) {
+            return ['bg-slate-100 text-slate-500', '—'];
+        }
+        if ($this->due_at->isPast()) {
+            return ['bg-rose-100 text-rose-700', 'Overdue'];
+        }
+        $days = (int) ceil(now()->diffInHours($this->due_at) / 24);
+        if ($days <= 3) {
+            return ['bg-amber-100 text-amber-700', $days.'d left'];
+        }
+
+        return ['bg-emerald-100 text-emerald-700', $days.'d left'];
+    }
+
     public function levelLabel(): string
     {
         return match ((int) $this->current_level) {

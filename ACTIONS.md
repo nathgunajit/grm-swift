@@ -121,3 +121,23 @@ Implements `docs/Phase 2- GRM Portal Enhancement Requirements – SWIFT Project.
 53. Updated feature tests for the OTP gate + optional Beel; added `OtpAndZoneTest`. `php artisan test` — **24 passed (68 assertions)**.
 54. `php artisan migrate:fresh --seed` clean. Drove the live app: all public + admin pages 200 at desktop/mobile, OTP send/verify/submit gate works, Beel-optional submit works, PDFs show logos + watermark, Zone CRUD works, dashboard charts render. Confirmed no Bootstrap / `bi-` classes remain in views.
 55. Updated `CLAUDE.md` (V2 stack) and this `ACTIONS.md`; committed V2 and pushed to GitHub. **V2 complete.**
+
+---
+
+# V3 — Admin Portal Enhancements & Module Visibility
+
+Implements `docs/enhancement or user visbility of the modules.docx`.
+
+## 2026-07-06 — V3
+
+56. Read the enhancement document; confirmed decisions with user (CPIU covers many districts → `districts.cpiu_id`; resolve = DFDO/CPIU/PIU/Super Admin; manual entry = Beel Animator/SSGC/PIU Officer/Super Admin).
+57. Migration `refactor_cpiu_district_remove_zones`: added `districts.cpiu_id`, dropped `cpius.zone_id`, dropped `zones` table. Deleted `Zone` model; updated `Cpiu` (districts hasMany) and `District` (cpiu belongsTo); reseeded districts→CPIU in `MasterSeeder`.
+58. Removed the Zone module surface: deleted `ZoneController` + `admin/masters/zones.blade.php`, removed the zones route and sidebar link.
+59. Role-based grievance actions: added `User::ROLE_GRIEVANCE_ACTIONS` + `canGrievance()`; guarded every action in `GrievanceAdminController`; restricted manual-entry routes/sidebar to the manual-entry roles; rewrote the Take-Action panel in `show.blade.php` to render only permitted tabs (PMU Admin = monitoring note).
+60. Escalation: `GrievanceService::escalate()` takes a target level + team note; the escalate form now selects the target Level and Team (committee) and shows the District, with a per-district GRC team list (`escalationTeams` from the controller).
+61. Masters — User Types: description → textarea, "Users" → "Users (Nos)"; Beel: Block exposed as a visible select (all fields visible); CPIU: district-assignment checkboxes where districts owned by another CPIU are disabled (`CpiuController::syncDistricts`).
+62. Committees: new `EmployeeController@search` (+ `admin/employees/search` route) and an Alpine autocomplete on the member-name field that fills name + designation.
+63. Grievance list: colour-coded Due pill (`Grievance::dueBadge()` — green >3d, amber ≤3d, red overdue, slate done) with a legend. Reports: on-time-vs-delayed breakdown + delayed-grievances table in `ReportController`, the reports page, CSV and PDF.
+64. Tests: replaced zone tests with a CPIU-district assignment test + `zone routes are gone`; added `RoleActionTest` (animator can't resolve/can escalate, DFDO resolves, PMU view-only, manual-entry gating); fixed the V1 resolve test to use DFDO. `php artisan test` — **31 passed (80 assertions)**.
+65. `migrate:fresh --seed` clean; `npm run build`; drove the live app per role: animator sees Comment/Escalate but no Resolve (resolve endpoint 403), PMU Admin is view-only, escalate shows Level+Team+District, `/admin/zones` 404s, employee autocomplete returns name+designation, CPIU disables taken districts, Beel shows Block, reports show on-time-vs-delayed (CSV/PDF included), due column colour-coded.
+66. Updated `CLAUDE.md` and this `ACTIONS.md`; committed V3 and pushed to GitHub. **V3 complete.**

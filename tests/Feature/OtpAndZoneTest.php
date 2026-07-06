@@ -64,16 +64,29 @@ class OtpAndZoneTest extends TestCase
         $this->assertSame(1, Grievance::where('is_anonymous', true)->where('description', 'like', '%OTP gate%')->count());
     }
 
-    public function test_zone_groups_cpius_and_crud_works(): void
+    public function test_districts_belong_to_a_cpiu_and_assignment_works(): void
     {
         $admin = User::where('email', 'admin@grmswift.local')->first();
 
-        // Seeded relationship: CPIU belongs to a zone.
-        $this->assertNotNull(\App\Models\Cpiu::whereNotNull('zone_id')->first());
+        // Seeded relationship: districts map to a CPIU.
+        $this->assertNotNull(\App\Models\District::whereNotNull('cpiu_id')->first());
 
-        $this->actingAs($admin)->post(route('admin.zones.store'), ['name' => 'New Test Zone', 'code' => 'ZNEW'])
-            ->assertRedirect();
-        $this->assertDatabaseHas('zones', ['name' => 'New Test Zone']);
+        // Assign a free district to a CPIU via the CPIU update endpoint.
+        $cpiu = \App\Models\Cpiu::first();
+        $district = \App\Models\District::first();
+
+        $this->actingAs($admin)->put(route('admin.cpius.update', $cpiu), [
+            'name' => $cpiu->name,
+            'code' => $cpiu->code,
+            'district_ids' => [$district->id],
+        ])->assertRedirect();
+
+        $this->assertSame($cpiu->id, $district->fresh()->cpiu_id);
+    }
+
+    public function test_zone_routes_are_gone(): void
+    {
+        $this->assertFalse(\Illuminate\Support\Facades\Route::has('admin.zones.index'));
     }
 
     public function test_beel_has_lat_long(): void

@@ -59,16 +59,17 @@ class GrievanceService
     }
 
     /**
-     * Escalate a grievance to the next level (max 3).
+     * Escalate a grievance to a higher level (default: next level, max 3).
+     * Optionally records the target committee/team in the timeline remark.
      */
-    public function escalate(Grievance $grievance, ?int $userId = null, ?string $remarks = null): bool
+    public function escalate(Grievance $grievance, ?int $userId = null, ?string $remarks = null, ?int $toLevel = null, ?string $teamNote = null): bool
     {
-        if ($grievance->current_level >= 3) {
+        $from = (int) $grievance->current_level;
+        $to = $toLevel ?: $from + 1;
+
+        if ($to <= $from || $to > 3) {
             return false;
         }
-
-        $from = (int) $grievance->current_level;
-        $to = $from + 1;
 
         $grievance->update([
             'current_level' => $to,
@@ -77,7 +78,8 @@ class GrievanceService
             'resolved_at' => null,
         ]);
 
-        $this->logAction($grievance, 'escalated', $userId, $remarks, $from, $to);
+        $note = trim(($remarks ?: 'Escalated to next level.').($teamNote ? ' '.$teamNote : ''));
+        $this->logAction($grievance, 'escalated', $userId, $note, $from, $to);
 
         return true;
     }

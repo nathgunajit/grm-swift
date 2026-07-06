@@ -21,7 +21,7 @@
         @endforeach
         <div class="card overflow-x-auto">
             <table class="table-grm">
-                <thead><tr><th>Name</th><th>Description</th><th>Users</th><th></th></tr></thead>
+                <thead><tr><th>Name</th><th>Description</th><th>Users (Nos)</th><th></th></tr></thead>
                 <tbody>
                     @foreach ($types as $t)
                         <tr>
@@ -29,8 +29,8 @@
                                 <input form="up-{{ $t->id }}" name="name" value="{{ $t->name }}" class="input">
                                 <span class="badge bg-slate-100 text-slate-500 mt-1">{{ $t->slug }}</span>
                             </td>
-                            <td><input form="up-{{ $t->id }}" name="description" value="{{ $t->description }}" class="input"></td>
-                            <td>{{ $t->users_count }}</td>
+                            <td><textarea form="up-{{ $t->id }}" name="description" rows="2" class="input">{{ $t->description }}</textarea></td>
+                            <td class="text-center"><span class="badge bg-brand-50 text-brand-700">{{ $t->users_count }}</span></td>
                             <td class="whitespace-nowrap">
                                 <button form="up-{{ $t->id }}" class="btn btn-sm btn-outline"><x-icon name="check" class="w-4 h-4" /></button>
                                 <button form="del-{{ $t->id }}" class="btn btn-sm btn-danger"><x-icon name="trash" class="w-4 h-4" /></button>

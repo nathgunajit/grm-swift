@@ -29,6 +29,11 @@ class ReportController extends Controller
         $rows[] = ['Average resolution time (days)', $data['avgDays']];
         $rows[] = ['Escalated cases', $data['escalatedCount']];
         $rows[] = [];
+        $rows[] = ['Resolution Timeliness', 'Count'];
+        $rows[] = ['Resolved on time', $data['onTime']];
+        $rows[] = ['Resolved late (delayed)', $data['delayedResolved']];
+        $rows[] = ['Open & overdue', $data['openOverdue']];
+        $rows[] = [];
         $rows[] = ['By Status', 'Count'];
         foreach ($data['byStatus'] as $k => $v) {
             $rows[] = [Grievance::STATUS_LABELS[$k] ?? $k, $v];
@@ -98,12 +103,33 @@ class ReportController extends Controller
         // Resolution within SLA: resolved on or before due date.
         $resolvedRows = $base()->whereIn('status', ['resolved', 'closed'])
             ->whereNotNull('resolved_at')->get(['resolved_at', 'due_at', 'created_at']);
-        $withinSla = $resolvedRows->filter(fn ($g) => $g->due_at && $g->resolved_at && $g->resolved_at->lte($g->due_at))->count();
-        $slaRate = $resolvedRows->count() ? round($withinSla / $resolvedRows->count() * 100, 1) : 0;
+        $onTime = $resolvedRows->filter(fn ($g) => $g->due_at && $g->resolved_at && $g->resolved_at->lte($g->due_at))->count();
+        $delayedResolved = $resolvedRows->count() - $onTime;
+        $slaRate = $resolvedRows->count() ? round($onTime / $resolvedRows->count() * 100, 1) : 0;
 
         $avgDays = $resolvedRows->count()
             ? round($resolvedRows->avg(fn ($g) => $g->created_at->diffInDays($g->resolved_at)), 1)
             : 0;
+
+        // Open grievances that are already past their due date.
+        $openOverdue = $base()->whereNotIn('status', ['resolved', 'closed'])
+            ->whereNotNull('due_at')->where('due_at', '<', now())->count();
+
+        // Delayed grievances list (resolved late or open & overdue) for the report table.
+        $delayedList = $base()->with(['category', 'district'])
+            ->where(function ($q) {
+                $q->where(fn ($w) => $w->whereIn('status', ['resolved', 'closed'])
+                    ->whereColumn('resolved_at', '>', 'due_at'))
+                  ->orWhere(fn ($w) => $w->whereNotIn('status', ['resolved', 'closed'])
+                    ->whereNotNull('due_at')->where('due_at', '<', now()));
+            })
+            ->latest('due_at')->limit(20)->get();
+
+        $onTimeVsDelayed = [
+            'On time' => $onTime,
+            'Delayed (resolved late)' => $delayedResolved,
+            'Open & overdue' => $openOverdue,
+        ];
 
         $satisfaction = $base()->join('grievance_feedback', 'grievances.id', '=', 'grievance_feedback.grievance_id')
             ->select('grievance_feedback.satisfaction', DB::raw('count(*) as c'))
@@ -111,7 +137,8 @@ class ReportController extends Controller
 
         return compact(
             'total', 'resolved', 'escalatedCount', 'byStatus', 'byLevel',
-            'byCategory', 'byDistrict', 'slaRate', 'avgDays', 'satisfaction'
+            'byCategory', 'byDistrict', 'slaRate', 'avgDays', 'satisfaction',
+            'onTime', 'delayedResolved', 'openOverdue', 'onTimeVsDelayed', 'delayedList'
         );
     }
 }

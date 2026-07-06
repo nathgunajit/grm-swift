@@ -104,23 +104,33 @@
 
 <footer class="mt-16 bg-brand-900 text-brand-100">
     {{-- Official partner logos --}}
-    <div class="border-b border-white/10">
-        <div class="mx-auto w-[90%] py-6">
-            <p class="text-center text-[11px] font-semibold uppercase tracking-widest text-brand-100/50 mb-4">An initiative of</p>
-            <div class="rounded-2xl bg-white px-6 py-5">
-                <div class="flex flex-wrap items-center justify-center gap-8 sm:gap-14">
-                    <img src="{{ asset('images/assam-govt-logo.png') }}" alt="Government of Assam" class="h-12 sm:h-16 w-auto object-contain" title="Government of Assam">
-                    @if (file_exists(public_path('images/adb-logo.png')))
-                        <img src="{{ asset('images/adb-logo.png') }}" alt="Asian Development Bank" class="h-12 sm:h-16 w-auto object-contain" title="Asian Development Bank">
-                    @else
-                        <span class="flex flex-col items-center justify-center text-center leading-tight" title="Asian Development Bank">
-                            <span class="font-display text-3xl sm:text-4xl font-extrabold text-[#006b5e]">ADB</span>
-                            <span class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Asian Development Bank</span>
-                        </span>
-                    @endif
-                    <img src="{{ asset('images/arias-logo.png') }}" alt="ARIAS Society" class="h-12 sm:h-16 w-auto object-contain" title="ARIAS Society">
-                    <img src="{{ asset('images/swift-logo.png') }}" alt="SWIFT Project" class="h-14 sm:h-20 w-auto object-contain" title="SWIFT Project">
-                </div>
+    <div class="relative border-b border-white/10 overflow-hidden">
+        <div class="pointer-events-none absolute -top-16 left-1/2 h-40 w-[36rem] -translate-x-1/2 rounded-full bg-accent-400/10 blur-3xl"></div>
+        <div class="relative mx-auto w-[90%] py-9">
+            {{-- heading with side rules --}}
+            <div class="flex items-center justify-center gap-3 mb-6">
+                <span class="h-px w-10 bg-gradient-to-r from-transparent to-white/25"></span>
+                <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-brand-100/70">
+                    <x-icon name="shield-check" class="w-4 h-4 text-accent-400" /> An Initiative Of
+                </span>
+                <span class="h-px w-10 bg-gradient-to-l from-transparent to-white/25"></span>
+            </div>
+
+            @php $partners = [
+                ['assam-govt-logo.png', 'Government of Assam'],
+                ['adb-logo.png', 'Asian Development Bank'],
+                ['arias-logo.png', 'ARIAS Society'],
+                ['swift-logo.png', 'SWIFT Project'],
+            ]; @endphp
+            <div class="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
+                @foreach ($partners as [$file, $name])
+                    <div class="group flex flex-col items-center rounded-2xl bg-white/95 px-4 py-5 ring-1 ring-white/10 shadow-lg transition-all duration-200 hover:-translate-y-1 hover:bg-white hover:shadow-xl">
+                        <div class="flex h-16 sm:h-20 items-center justify-center">
+                            <img src="{{ asset('images/'.$file) }}" alt="{{ $name }}" class="max-h-16 sm:max-h-20 w-auto object-contain transition group-hover:scale-105">
+                        </div>
+                        <span class="mt-3 text-[11px] sm:text-xs font-semibold text-slate-600 text-center leading-tight">{{ $name }}</span>
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>

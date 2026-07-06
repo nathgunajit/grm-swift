@@ -117,26 +117,29 @@
             </div>
 
             @php $partners = [
-                ['assam-govt-logo.png', 'Government of Assam'],
-                ['adb-logo.png', 'Asian Development Bank'],
-                ['arias-logo.png', 'ARIAS Society'],
-                ['swift-logo.png', 'SWIFT Project'],
+                ['assam-govt-logo.png', 'Government of Assam', 'https://assam.gov.in'],
+                ['adb-logo.png', 'Asian Development Bank', 'https://www.adb.org'],
+                ['arias-logo.png', 'ARIAS Society', 'https://www.arias.in'],
+                ['swift-logo.png', 'SWIFT Project', 'https://www.arias.in'],
             ]; @endphp
             <div class="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
-                @foreach ($partners as [$file, $name])
-                    <div class="group flex flex-col items-center rounded-2xl bg-white/95 px-4 py-5 ring-1 ring-white/10 shadow-lg transition-all duration-200 hover:-translate-y-1 hover:bg-white hover:shadow-xl">
+                @foreach ($partners as [$file, $name, $url])
+                    <a href="{{ $url }}" target="_blank" rel="noopener" title="Visit {{ $name }}"
+                       class="group relative flex flex-col items-center rounded-2xl bg-white/95 px-4 py-5 ring-1 ring-white/10 shadow-lg transition-all duration-200 hover:-translate-y-1 hover:bg-white hover:shadow-xl">
+                        <span class="absolute top-2.5 right-2.5 text-slate-300 opacity-0 transition group-hover:opacity-100"><x-icon name="globe" class="w-3.5 h-3.5" /></span>
                         <div class="flex h-16 sm:h-20 items-center justify-center">
                             <img src="{{ asset('images/'.$file) }}" alt="{{ $name }}" class="max-h-16 sm:max-h-20 w-auto object-contain transition group-hover:scale-105">
                         </div>
-                        <span class="mt-3 text-[11px] sm:text-xs font-semibold text-slate-600 text-center leading-tight">{{ $name }}</span>
-                    </div>
+                        <span class="mt-3 text-[11px] sm:text-xs font-semibold text-slate-600 text-center leading-tight group-hover:text-brand-700">{{ $name }}</span>
+                    </a>
                 @endforeach
             </div>
+            <p class="mt-4 text-center text-[11px] text-brand-100/50">Tap a logo to visit the official website.</p>
         </div>
     </div>
     <div class="mx-auto w-[90%] py-10">
-        <div class="grid gap-8 md:grid-cols-4">
-            <div class="md:col-span-2">
+        <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-5">
+            <div class="lg:col-span-2">
                 <div class="flex items-center gap-2 text-white font-display font-bold text-lg mb-3">
                     <x-icon name="water" class="w-6 h-6 text-accent-400" /> SWIFT GRM Portal
                 </div>
@@ -146,18 +149,30 @@
             <div>
                 <h6 class="text-white font-semibold mb-3">Quick Links</h6>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="{{ route('grievance.create') }}" class="hover:text-white">Register a Grievance</a></li>
-                    <li><a href="{{ route('track') }}" class="hover:text-white">Track Status</a></li>
-                    <li><a href="{{ route('process') }}" class="hover:text-white">GRM Process</a></li>
-                    <li><a href="{{ route('privacy') }}" class="hover:text-white">Privacy Policy</a></li>
+                    <li><a href="{{ route('grievance.create') }}" class="inline-flex items-center gap-1.5 hover:text-white transition"><x-icon name="pencil" class="w-3.5 h-3.5 text-accent-400" /> Register a Grievance</a></li>
+                    <li><a href="{{ route('track') }}" class="inline-flex items-center gap-1.5 hover:text-white transition"><x-icon name="search" class="w-3.5 h-3.5 text-accent-400" /> Track Status</a></li>
+                    <li><a href="{{ route('process') }}" class="inline-flex items-center gap-1.5 hover:text-white transition"><x-icon name="diagram" class="w-3.5 h-3.5 text-accent-400" /> GRM Process</a></li>
+                    <li><a href="{{ route('faq') }}" class="inline-flex items-center gap-1.5 hover:text-white transition"><x-icon name="question" class="w-3.5 h-3.5 text-accent-400" /> FAQ &amp; Help</a></li>
+                    <li><a href="{{ route('privacy') }}" class="inline-flex items-center gap-1.5 hover:text-white transition"><x-icon name="shield-lock" class="w-3.5 h-3.5 text-accent-400" /> Privacy Policy</a></li>
                 </ul>
+            </div>
+            <div>
+                <h6 class="text-white font-semibold mb-3">Resources</h6>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="{{ route('resources') }}" class="inline-flex items-center gap-1.5 hover:text-white transition"><x-icon name="folder" class="w-3.5 h-3.5 text-accent-400" /> Resources &amp; IEC</a></li>
+                    <li><a href="{{ route('resources.download', 'FINAL GRM Manual.pdf') }}" class="inline-flex items-center gap-1.5 hover:text-white transition"><x-icon name="download" class="w-3.5 h-3.5 text-accent-400" /> GRM Manual (PDF)</a></li>
+                </ul>
+                <div class="mt-4 rounded-xl bg-white/5 ring-1 ring-white/10 p-3">
+                    <p class="text-[11px] font-semibold uppercase tracking-wide text-accent-300 flex items-center gap-1.5"><x-icon name="star" class="w-3.5 h-3.5" /> Latest Update</p>
+                    <p class="mt-1 text-xs text-brand-100/70 leading-relaxed">Portal enhanced with online OTP verification, live tracking &amp; downloadable acknowledgment.</p>
+                </div>
             </div>
             <div>
                 <h6 class="text-white font-semibold mb-3">Contact</h6>
                 <ul class="space-y-2 text-sm">
-                    <li class="flex items-center gap-2"><x-icon name="phone" class="w-4 h-4" /> 0361-2332004</li>
-                    <li class="flex items-center gap-2"><x-icon name="envelope" class="w-4 h-4" /> spd@arias.in</li>
-                    <li class="flex items-center gap-2"><x-icon name="globe" class="w-4 h-4" /> www.arias.in</li>
+                    <li class="flex items-center gap-2"><x-icon name="phone" class="w-4 h-4 text-accent-400" /> 0361-2332004</li>
+                    <li class="flex items-center gap-2"><x-icon name="envelope" class="w-4 h-4 text-accent-400" /> spd@arias.in</li>
+                    <li><a href="https://www.arias.in" target="_blank" rel="noopener" class="flex items-center gap-2 hover:text-white transition"><x-icon name="globe" class="w-4 h-4 text-accent-400" /> www.arias.in</a></li>
                 </ul>
             </div>
         </div>

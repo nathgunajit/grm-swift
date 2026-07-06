@@ -7,7 +7,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('head')
 </head>
-<body class="min-h-screen flex flex-col bg-slate-50">
+<body class="min-h-screen flex flex-col bg-slate-50 overflow-x-hidden">
 
 {{-- Accent top rule --}}
 <div class="h-1 bg-gradient-to-r from-accent-500 via-accent-400 to-brand-500"></div>
@@ -44,8 +44,6 @@
                     ['home', 'Home', 'home'],
                     ['track', 'Track Complaint', 'search'],
                     ['process', 'GRM Process', 'diagram'],
-                    ['resources', 'Resources', 'folder'],
-                    ['faq', 'Help & FAQ', 'question'],
                     ['contact', 'Contact', 'phone'],
                 ];
             @endphp

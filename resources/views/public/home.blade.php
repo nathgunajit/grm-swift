@@ -47,6 +47,40 @@
         </div>
     </section>
 
+    {{-- How It Works --}}
+    <section class="pt-14">
+        <div class="text-center mb-10">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 ring-1 ring-brand-100">How It Works</span>
+            <h2 class="mt-3 text-3xl font-bold text-slate-800">Four simple steps to resolution</h2>
+            <p class="mt-2 text-slate-500">From raising your voice to a fair outcome — clear and time-bound.</p>
+        </div>
+        <div class="relative grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {{-- connecting line (desktop) --}}
+            <div class="hidden lg:block absolute top-8 left-[12%] right-[12%] h-0.5 bg-gradient-to-r from-brand-200 via-accent-400 to-brand-200"></div>
+            @php $steps = [
+                ['1', 'pencil', 'Submit', 'Lodge your complaint or suggestion online, or through a field officer — anonymously if you prefer.'],
+                ['2', 'download', 'Acknowledge', 'Instantly receive a unique Tracking ID and a downloadable acknowledgment slip.'],
+                ['3', 'people', 'Review & Resolve', 'The Grievance Redressal Committee reviews, acts, and resolves — escalating if needed.'],
+                ['4', 'star', 'Feedback', 'Track the outcome, share your feedback, and reopen the case if you are not satisfied.'],
+            ]; @endphp
+            @foreach ($steps as [$n, $icon, $title, $desc])
+                <div class="relative text-center">
+                    <div class="relative z-10 mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-md ring-1 ring-slate-100">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-brand-500 text-white">
+                            <x-icon name="{{ $icon }}" class="w-6 h-6" />
+                        </div>
+                        <span class="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-accent-500 text-xs font-bold text-white ring-2 ring-white">{{ $n }}</span>
+                    </div>
+                    <h3 class="mt-4 font-semibold text-slate-800">{{ $title }}</h3>
+                    <p class="mt-1.5 text-sm text-slate-500 leading-relaxed">{{ $desc }}</p>
+                </div>
+            @endforeach
+        </div>
+        <div class="mt-10 text-center">
+            <a href="{{ route('grievance.create') }}" class="btn btn-accent px-6 py-3 text-base shadow-lg"><x-icon name="pencil" class="w-5 h-5" /> Start — Register a Complaint</a>
+        </div>
+    </section>
+
     {{-- 3-tier GRC --}}
     <section class="py-14">
         <div class="text-center mb-10">

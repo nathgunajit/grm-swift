@@ -3,55 +3,28 @@
 
 @section('content')
 {{-- Hero --}}
-<section class="relative overflow-hidden text-white" style="background: linear-gradient(135deg, rgba(0,6,102,0.95) 0%, rgba(0,107,94,0.92) 100%);">
-    {{-- decorative layers --}}
-    <div class="absolute inset-0 opacity-[0.07]" style="background-image:radial-gradient(circle at 20% 30%, #fff 1.5px, transparent 1.5px);background-size:30px 30px;"></div>
-    <div class="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-emerald-400/20 blur-3xl"></div>
-    <div class="pointer-events-none absolute -bottom-28 -left-20 h-96 w-96 rounded-full bg-accent-400/20 blur-3xl"></div>
-    <div class="pointer-events-none absolute top-1/3 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-cyan-300/10 blur-3xl"></div>
-
-    <div class="relative mx-auto max-w-7xl px-4 py-20 sm:py-24">
-        <div class="grid items-center gap-12 lg:grid-cols-2">
+<section class="relative overflow-hidden bg-gradient-to-br from-brand-800 via-brand-700 to-brand-600 text-white">
+    <div class="absolute inset-0 opacity-10" style="background-image:radial-gradient(circle at 20% 30%, #fff 1px, transparent 1px);background-size:28px 28px;"></div>
+    <div class="relative mx-auto max-w-7xl px-4 py-16 sm:py-20">
+        <div class="grid items-center gap-10 lg:grid-cols-2">
             <div>
-                <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-semibold ring-1 ring-white/20 backdrop-blur">
-                    <span class="flex h-2 w-2 rounded-full bg-accent-400"></span> ADB-assisted · ARIAS Society · Govt. of Assam
+                <span class="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
+                    <x-icon name="shield-check" class="w-4 h-4 text-accent-300" /> ADB-assisted SWIFT Project
                 </span>
-                <h1 class="mt-5 font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.08]">
-                    Grievance <span class="bg-gradient-to-r from-accent-300 to-amber-200 bg-clip-text text-transparent">Redressal</span> Mechanism
-                </h1>
-                <p class="mt-5 max-w-xl text-white/85 text-lg leading-relaxed">A structured, accessible and time-bound platform to receive, assess and resolve grievances under the SWIFT Project. Your voice matters — complaints are free and can be anonymous.</p>
+                <h1 class="mt-4 font-display text-4xl sm:text-5xl font-extrabold leading-tight text-white">Grievance Redressal Mechanism</h1>
+                <p class="mt-4 max-w-xl text-brand-50/90 text-lg">A structured, accessible and time-bound platform to receive, assess and resolve grievances. Your voice matters — complaints are free and can be anonymous.</p>
                 <div class="mt-8 flex flex-wrap gap-3">
-                    <a href="{{ route('grievance.create') }}" class="btn btn-accent px-6 py-3 text-base shadow-xl shadow-accent-500/30 hover:-translate-y-0.5 transition"><x-icon name="pencil" class="w-5 h-5" /> Register a Complaint</a>
-                    <a href="{{ route('track') }}" class="btn px-6 py-3 text-base bg-white/10 text-white ring-1 ring-white/30 hover:bg-white/20 backdrop-blur"><x-icon name="search" class="w-5 h-5" /> Track Status</a>
-                </div>
-                <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-white/75">
-                    <span class="inline-flex items-center gap-1.5"><x-icon name="check-circle" class="w-4 h-4 text-accent-300" /> Free of cost</span>
-                    <span class="inline-flex items-center gap-1.5"><x-icon name="shield-lock" class="w-4 h-4 text-accent-300" /> Confidential &amp; anonymous</span>
-                    <span class="inline-flex items-center gap-1.5"><x-icon name="clock" class="w-4 h-4 text-accent-300" /> Time-bound resolution</span>
+                    <a href="{{ route('grievance.create') }}" class="btn btn-accent px-6 py-3 text-base shadow-lg"><x-icon name="pencil" class="w-5 h-5" /> Register a Complaint</a>
+                    <a href="{{ route('track') }}" class="btn px-6 py-3 text-base bg-white/10 text-white border border-white/30 hover:bg-white/20"><x-icon name="search" class="w-5 h-5" /> Track Status</a>
                 </div>
             </div>
-
-            {{-- Visual --}}
             <div class="hidden lg:flex justify-center">
-                <div class="relative">
-                    <div class="rounded-[2rem] bg-white/10 p-12 backdrop-blur-md ring-1 ring-white/20 shadow-2xl">
-                        <x-icon name="shield-check" class="w-44 h-44 text-white" />
-                    </div>
-                    {{-- floating chips --}}
-                    <div class="absolute -left-8 top-8 flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-slate-700 shadow-lg">
-                        <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600"><x-icon name="check-circle" class="w-5 h-5" /></span>
-                        <span class="text-xs font-semibold leading-tight">Tracking ID<br><span class="font-normal text-slate-400">issued instantly</span></span>
-                    </div>
-                    <div class="absolute -right-6 bottom-10 flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-slate-700 shadow-lg">
-                        <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-600"><x-icon name="people" class="w-5 h-5" /></span>
-                        <span class="text-xs font-semibold leading-tight">3-Tier GRC<br><span class="font-normal text-slate-400">fair review</span></span>
-                    </div>
+                <div class="rounded-3xl bg-white/10 p-10 backdrop-blur ring-1 ring-white/20">
+                    <x-icon name="shield-check" class="w-48 h-48 text-white/90" />
                 </div>
             </div>
         </div>
     </div>
-    {{-- bottom wave --}}
-    <svg class="absolute bottom-0 left-0 w-full text-slate-50" viewBox="0 0 1440 60" preserveAspectRatio="none" style="height:40px"><path fill="currentColor" d="M0,32L80,37.3C160,43,320,53,480,53.3C640,53,800,43,960,37.3C1120,32,1280,32,1360,32L1440,32L1440,60L0,60Z"></path></svg>
 </section>
 
 <div class="mx-auto max-w-7xl px-4">
@@ -85,10 +58,10 @@
             {{-- connecting line (desktop) --}}
             <div class="hidden lg:block absolute top-8 left-[12%] right-[12%] h-0.5 bg-gradient-to-r from-brand-200 via-accent-400 to-brand-200"></div>
             @php $steps = [
-                ['1', 'pencil', 'Submit Grievance', 'Lodge your complaint or suggestion online, or through a field officer — anonymously if you prefer.'],
-                ['2', 'search', 'Initial Verification', 'Your grievance is registered, acknowledged with a Tracking ID, and screened for GRM scope.'],
-                ['3', 'people', 'Processing', 'The Grievance Redressal Committee reviews and acts, escalating through the levels if needed.'],
-                ['4', 'check-circle', 'Final Resolution', 'The decision is communicated, feedback is captured, and the case is closed fairly.'],
+                ['1', 'pencil', 'Submit', 'Lodge your complaint or suggestion online, or through a field officer — anonymously if you prefer.'],
+                ['2', 'download', 'Acknowledge', 'Instantly receive a unique Tracking ID and a downloadable acknowledgment slip.'],
+                ['3', 'people', 'Review & Resolve', 'The Grievance Redressal Committee reviews, acts, and resolves — escalating if needed.'],
+                ['4', 'star', 'Feedback', 'Track the outcome, share your feedback, and reopen the case if you are not satisfied.'],
             ]; @endphp
             @foreach ($steps as [$n, $icon, $title, $desc])
                 <div class="relative text-center">

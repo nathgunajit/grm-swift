@@ -5,7 +5,7 @@
 {{-- Hero --}}
 <section class="relative overflow-hidden bg-gradient-to-br from-brand-800 via-brand-700 to-brand-600 text-white">
     <div class="absolute inset-0 opacity-10" style="background-image:radial-gradient(circle at 20% 30%, #fff 1px, transparent 1px);background-size:28px 28px;"></div>
-    <div class="relative mx-auto max-w-7xl px-4 py-16 sm:py-20">
+    <div class="relative mx-auto w-[90%] py-16 sm:py-20">
         <div class="grid items-center gap-10 lg:grid-cols-2">
             <div>
                 <span class="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
@@ -27,7 +27,7 @@
     </div>
 </section>
 
-<div class="mx-auto max-w-7xl px-4">
+<div class="mx-auto w-[90%]">
     {{-- Stats --}}
     <section class="-mt-10 relative z-10">
         <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
@@ -58,10 +58,10 @@
             {{-- connecting line (desktop) --}}
             <div class="hidden lg:block absolute top-8 left-[12%] right-[12%] h-0.5 bg-gradient-to-r from-brand-200 via-accent-400 to-brand-200"></div>
             @php $steps = [
-                ['1', 'pencil', 'Submit', 'Lodge your complaint or suggestion online, or through a field officer — anonymously if you prefer.'],
-                ['2', 'download', 'Acknowledge', 'Instantly receive a unique Tracking ID and a downloadable acknowledgment slip.'],
-                ['3', 'people', 'Review & Resolve', 'The Grievance Redressal Committee reviews, acts, and resolves — escalating if needed.'],
-                ['4', 'star', 'Feedback', 'Track the outcome, share your feedback, and reopen the case if you are not satisfied.'],
+                ['1', 'pencil', 'Submit Grievance', 'Lodge your complaint or suggestion online, or through a field officer — anonymously if you prefer.'],
+                ['2', 'search', 'Initial Verification', 'Your grievance is registered, acknowledged with a Tracking ID, and screened for GRM scope.'],
+                ['3', 'people', 'Processing', 'The Grievance Redressal Committee reviews and acts, escalating through the levels if needed.'],
+                ['4', 'check-circle', 'Final Resolution', 'The decision is communicated, feedback is captured, and the case is closed fairly.'],
             ]; @endphp
             @foreach ($steps as [$n, $icon, $title, $desc])
                 <div class="relative text-center">

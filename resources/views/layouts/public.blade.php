@@ -14,7 +14,7 @@
 
 {{-- Utility bar --}}
 <div class="bg-brand-900 text-brand-100/90 text-xs">
-    <div class="mx-auto max-w-7xl px-4 h-9 flex items-center justify-between">
+    <div class="mx-auto w-[90%] h-9 flex items-center justify-between">
         <span class="flex items-center gap-1.5"><x-icon name="globe" class="w-3.5 h-3.5 text-accent-400" /> Government of Assam · ARIAS Society</span>
         <div class="hidden sm:flex items-center gap-5">
             <a href="tel:03612332004" class="flex items-center gap-1.5 hover:text-white transition"><x-icon name="phone" class="w-3.5 h-3.5" /> Helpline: 0361-2332004</a>
@@ -25,7 +25,7 @@
 
 {{-- Portal header (title + navigation, no logos) --}}
 <header x-data="{ open: false }" class="sticky top-0 z-40 bg-gradient-to-r from-brand-900 via-brand-800 to-brand-600 shadow-lg ring-1 ring-black/5">
-    <div class="mx-auto max-w-7xl px-4">
+    <div class="mx-auto w-[90%]">
         <div class="flex h-16 items-center justify-between gap-4">
             {{-- Portal title --}}
             <a href="{{ route('home') }}" class="flex items-center gap-3 text-white group shrink-0">
@@ -88,12 +88,12 @@
 </header>
 
 @if (session('success'))
-    <div class="mx-auto max-w-7xl px-4 pt-4">
+    <div class="mx-auto w-[90%] pt-4">
         <div class="rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 text-sm">{{ session('success') }}</div>
     </div>
 @endif
 @if (session('error'))
-    <div class="mx-auto max-w-7xl px-4 pt-4">
+    <div class="mx-auto w-[90%] pt-4">
         <div class="rounded-lg bg-rose-50 border border-rose-200 text-rose-800 px-4 py-3 text-sm">{{ session('error') }}</div>
     </div>
 @endif
@@ -103,7 +103,28 @@
 </main>
 
 <footer class="mt-16 bg-brand-900 text-brand-100">
-    <div class="mx-auto max-w-7xl px-4 py-10">
+    {{-- Official partner logos --}}
+    <div class="border-b border-white/10">
+        <div class="mx-auto w-[90%] py-6">
+            <p class="text-center text-[11px] font-semibold uppercase tracking-widest text-brand-100/50 mb-4">An initiative of</p>
+            <div class="rounded-2xl bg-white px-6 py-5">
+                <div class="flex flex-wrap items-center justify-center gap-8 sm:gap-14">
+                    <img src="{{ asset('images/assam-govt-logo.png') }}" alt="Government of Assam" class="h-12 sm:h-16 w-auto object-contain" title="Government of Assam">
+                    @if (file_exists(public_path('images/adb-logo.png')))
+                        <img src="{{ asset('images/adb-logo.png') }}" alt="Asian Development Bank" class="h-12 sm:h-16 w-auto object-contain" title="Asian Development Bank">
+                    @else
+                        <span class="flex flex-col items-center justify-center text-center leading-tight" title="Asian Development Bank">
+                            <span class="font-display text-3xl sm:text-4xl font-extrabold text-[#006b5e]">ADB</span>
+                            <span class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Asian Development Bank</span>
+                        </span>
+                    @endif
+                    <img src="{{ asset('images/arias-logo.png') }}" alt="ARIAS Society" class="h-12 sm:h-16 w-auto object-contain" title="ARIAS Society">
+                    <img src="{{ asset('images/swift-logo.png') }}" alt="SWIFT Project" class="h-14 sm:h-20 w-auto object-contain" title="SWIFT Project">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mx-auto w-[90%] py-10">
         <div class="grid gap-8 md:grid-cols-4">
             <div class="md:col-span-2">
                 <div class="flex items-center gap-2 text-white font-display font-bold text-lg mb-3">

@@ -28,6 +28,11 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::post('grievances/{grievance}/escalate', [GrievanceAdminController::class, 'escalate'])->name('grievances.escalate');
     Route::post('grievances/{grievance}/resolve', [GrievanceAdminController::class, 'resolve'])->name('grievances.resolve');
 
+    // In-app notifications (bell) — all authenticated roles
+    Route::get('notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/read-all', [\App\Http\Controllers\Admin\NotificationController::class, 'readAll'])->name('notifications.readAll');
+    Route::get('notifications/{id}/read', [\App\Http\Controllers\Admin\NotificationController::class, 'read'])->name('notifications.read');
+
     // Reports
     Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('reports/export/csv', [ReportController::class, 'exportCsv'])->name('reports.csv');

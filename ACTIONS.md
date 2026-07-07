@@ -141,3 +141,19 @@ Implements `docs/enhancement or user visbility of the modules.docx`.
 64. Tests: replaced zone tests with a CPIU-district assignment test + `zone routes are gone`; added `RoleActionTest` (animator can't resolve/can escalate, DFDO resolves, PMU view-only, manual-entry gating); fixed the V1 resolve test to use DFDO. `php artisan test` — **31 passed (80 assertions)**.
 65. `migrate:fresh --seed` clean; `npm run build`; drove the live app per role: animator sees Comment/Escalate but no Resolve (resolve endpoint 403), PMU Admin is view-only, escalate shows Level+Team+District, `/admin/zones` 404s, employee autocomplete returns name+designation, CPIU disables taken districts, Beel shows Block, reports show on-time-vs-delayed (CSV/PDF included), due column colour-coded.
 66. Updated `CLAUDE.md` and this `ACTIONS.md`; committed V3 and pushed to GitHub. **V3 complete.**
+
+---
+
+# V4 — Notifications (Email + Demo SMS + Admin Bell)
+
+Complainant gets email + SMS with their Tracking/Ack ID on submit and on each action; officers get an in-app bell alert. Demo SMS gateway (no real SMS/email dispatched).
+
+## 2026-07-07 — V4
+
+67. Infra: `notifications` table (Laravel database channel) + `sms_logs` table/model migrations. `SmsService` demo gateway (`config/services.php` → `sms.driver`, default `log`) that persists to `sms_logs` + app log, with an MSG91 live stub. Custom `App\Notifications\Channels\SmsChannel` routes a notification's `toSms()` through `SmsService`.
+68. Notification classes: `GrievanceRegistered` + `GrievanceUpdated` (complainant — mail + SMS, carrying Tracking ID / Ack No / status / track link), `GrievanceAdminAlert` (officers — database channel, with title/body/icon/url). `via()` picks channels from the AnonymousNotifiable's available mail/sms routes.
+69. `GrievanceNotifier` service: `registered()` and `actionTaken()` fan each event out to the complainant (skipped when anonymous or no contact) and to jurisdiction-scoped officers via `officersFor()` (mirrors `Grievance::scopeVisibleTo`: full-visibility roles always + district/beel/CPIU matches, guarded against null jurisdiction).
+70. Wired the notifier into `GrievanceController` (online submit, feedback→close, reopen) and `GrievanceAdminController` (manual store, review, comment, escalate, resolve). Complainant is emailed/SMSed on register, escalate, resolve; officers get a bell alert on every event.
+71. Admin bell: `Admin\NotificationController` (index/read/readAll) + routes; bell dropdown in `layouts/admin.blade.php` (unread badge, recent 8, mark-all-read) + sidebar link with unread count; added a `bell` icon. `admin/notifications` page with an Inbox tab and a demo-SMS-log tab (Super Admin/PMU Admin).
+72. Tests: `NotificationTest` — online submit creates an SMS log with the tracking ID + an officer database notification; resolve SMSes the complainant + alerts the officer; bell page loads. `php artisan test` — **35 passed (91 assertions)**. `migrate` + `npm run build` clean.
+73. Updated `CLAUDE.md` (notifications in stack/modules/DB/status → V4) and this `ACTIONS.md`. **V4 complete.**

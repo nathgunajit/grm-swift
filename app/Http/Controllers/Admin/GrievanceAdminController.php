@@ -8,13 +8,16 @@ use App\Models\Beel;
 use App\Models\Committee;
 use App\Models\Grievance;
 use App\Models\GrievanceCategory;
+use App\Services\GrievanceNotifier;
 use App\Services\GrievanceService;
 use Illuminate\Http\Request;
 
 class GrievanceAdminController extends Controller
 {
-    public function __construct(private GrievanceService $service)
-    {
+    public function __construct(
+        private GrievanceService $service,
+        private GrievanceNotifier $notifier,
+    ) {
     }
 
     public function index(Request $request)
@@ -117,6 +120,8 @@ class GrievanceAdminController extends Controller
         $this->service->logAction($grievance, 'registered', $request->user()->id, 'Manually registered ('.$data['mode_of_receipt'].').', null, 1);
         $this->service->logAction($grievance, 'acknowledged', $request->user()->id, 'Acknowledgment issued: '.$grievance->acknowledgment_no, 1, 1);
 
+        $this->notifier->registered($grievance->fresh(['category', 'district']));
+
         return redirect()->route('admin.grievances.show', $grievance)->with('success', 'Grievance registered. Tracking ID: '.$grievance->tracking_id);
     }
 
@@ -131,6 +136,9 @@ class GrievanceAdminController extends Controller
         }
         $this->service->logAction($grievance, 'reviewed', $request->user()->id, $request->input('remarks') ?: 'Marked under review.', $grievance->current_level, $grievance->current_level);
 
+        $this->notifier->actionTaken($grievance->fresh(['district']), 'Grievance under review',
+            'Being reviewed by '.$request->user()->name.' at '.$grievance->levelLabel().'.', false, 'eye');
+
         return back()->with('success', 'Grievance marked under review.');
     }
 
@@ -140,6 +148,9 @@ class GrievanceAdminController extends Controller
         abort_unless($request->user()->canGrievance('comment'), 403);
         $request->validate(['remarks' => ['required', 'string', 'max:1000']]);
         $this->service->logAction($grievance, 'commented', $request->user()->id, $request->input('remarks'), $grievance->current_level, $grievance->current_level);
+
+        $this->notifier->actionTaken($grievance->fresh(['district']), 'New comment added',
+            'A note was added by '.$request->user()->name.'.', false, 'chat');
 
         return back()->with('success', 'Comment added to the timeline.');
     }
@@ -163,6 +174,12 @@ class GrievanceAdminController extends Controller
 
         $ok = $this->service->escalate($grievance, $request->user()->id, $data['remarks'] ?? null, $toLevel, $teamNote);
 
+        if ($ok) {
+            $fresh = $grievance->fresh(['district']);
+            $this->notifier->actionTaken($fresh, 'Grievance escalated',
+                'Escalated to '.$fresh->levelLabel().($teamNote ? ' '.$teamNote : '').'.', true, 'arrow-up');
+        }
+
         return back()->with($ok ? 'success' : 'error',
             $ok ? 'Grievance escalated to '.$grievance->fresh()->levelLabel().'.' : 'Cannot escalate further (already at the highest level).');
     }
@@ -174,6 +191,9 @@ class GrievanceAdminController extends Controller
         $data = $request->validate(['resolution' => ['required', 'string', 'min:5', 'max:2000']]);
 
         $this->service->resolve($grievance, $data['resolution'], $request->user()->id);
+
+        $this->notifier->actionTaken($grievance->fresh(['district']), 'Grievance resolved',
+            'Your grievance has been resolved. Please review the resolution and share your feedback.', true, 'check');
 
         return back()->with('success', 'Grievance resolved. The complainant can view the resolution and provide feedback.');
     }

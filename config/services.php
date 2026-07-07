@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    // SMS gateway. Demo default: 'log' — messages are stored in sms_logs and the
+    // app log, no real SMS is sent. Set SMS_DRIVER=msg91 with credentials to go live.
+    'sms' => [
+        'driver' => env('SMS_DRIVER', 'log'),
+        'key' => env('SMS_API_KEY'),
+        'sender' => env('SMS_SENDER', 'SWIFTG'),
+    ],
+
 ];

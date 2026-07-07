@@ -7,14 +7,17 @@ use App\Http\Requests\StoreGrievanceRequest;
 use App\Models\Beel;
 use App\Models\Grievance;
 use App\Models\GrievanceCategory;
+use App\Services\GrievanceNotifier;
 use App\Services\GrievanceService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class GrievanceController extends Controller
 {
-    public function __construct(private GrievanceService $service)
-    {
+    public function __construct(
+        private GrievanceService $service,
+        private GrievanceNotifier $notifier,
+    ) {
     }
 
     public function create()
@@ -77,6 +80,9 @@ class GrievanceController extends Controller
 
         $this->service->logAction($grievance, 'registered', null, 'Grievance registered online.', null, 1);
         $this->service->logAction($grievance, 'acknowledged', null, 'Acknowledgment issued: '.$grievance->acknowledgment_no, 1, 1);
+
+        // Email + SMS the complainant their Tracking ID; alert the relevant officers' bell.
+        $this->notifier->registered($grievance->fresh(['category', 'district']));
 
         return redirect()->route('grievance.submitted', $grievance->tracking_id);
     }
@@ -152,6 +158,9 @@ class GrievanceController extends Controller
             $this->service->logAction($grievance, 'closed', null, 'Closed after complainant feedback.', $grievance->current_level, $grievance->current_level);
         }
 
+        $this->notifier->actionTaken($grievance->fresh(['district']), 'Feedback received & grievance closed',
+            'The complainant submitted feedback ('.$data['satisfaction'].' satisfied).', false, 'check');
+
         return redirect()->route('track')->with('success', 'Thank you — your feedback has been recorded and the grievance is now closed.');
     }
 
@@ -169,6 +178,9 @@ class GrievanceController extends Controller
             $grievance->update(['status' => 'reopened', 'resolved_at' => null]);
             $this->service->logAction($grievance, 'reopened', null, 'Reopened by complainant: '.$request->input('reason'), $grievance->current_level, $grievance->current_level);
         }
+
+        $this->notifier->actionTaken($grievance->fresh(['district']), 'Grievance reopened by complainant',
+            'Forwarded for further review at '.$grievance->fresh()->levelLabel().'.', false, 'refresh');
 
         return redirect()->route('track')->with('success', 'Your grievance has been reopened and forwarded for further review.');
     }
